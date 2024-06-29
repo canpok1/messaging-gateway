@@ -67,7 +67,7 @@ jobs:
           MYSQL_USER: service
           MYSQL_PASSWORD: password
         options: >-
-          --health-cmd "mysqladmin ping"
+          --health-cmd "healthcheck.sh --connect --innodb_initialized"
           --health-interval 10s
           --health-timeout 10s
           --health-retries 5
@@ -80,16 +80,16 @@ jobs:
         env:
           VERSION: 1.76.1
         run: |
-          curl -o tbls.deb -L https://github.com/k1LoW/tbls/releases/download/v$VERSION/tbls_$VERSION-1_arm64.deb
-          dpkg -i tbls.deb
+          curl -o tbls.deb -L https://github.com/k1LoW/tbls/releases/download/v${VERSION}/tbls_${VERSION}-1_amd64.deb
+          sudo dpkg -i tbls.deb
           rm tbls.deb
 
       - name: install migrate command
         env:
           VERSION: 4.17.1
         run: |
-          curl -o migrate.deb -L https://github.com/golang-migrate/migrate/releases/download/v$VERSION/migrate.linux-arm64.deb
-          dpkg -i migrate.deb
+          curl -o migrate.deb -L https://github.com/golang-migrate/migrate/releases/download/v${VERSION}/migrate.linux-amd64.deb
+          sudo dpkg -i migrate.deb
           rm migrate.deb
 
       - name: test migrate up
@@ -147,11 +147,11 @@ jobs:
     steps:
       - uses: actions/checkout@v3
 
-      - name: Download coverage reports
-        uses: actions/download-artifact@v3
-        with:
-          name: coverage-reports
-          path: public/coverage
+      # - name: Download coverage reports
+      #   uses: actions/download-artifact@v3
+      #   with:
+      #     name: coverage-reports
+      #     path: public/coverage
 
       - name: Download db docs
         uses: actions/download-artifact@v3
