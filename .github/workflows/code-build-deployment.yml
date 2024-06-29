@@ -140,6 +140,27 @@ jobs:
           tags: |
             ghcr.io/${{ github.repository }}/${{ matrix.app }}:latest
 
+  deploy_web:
+    runs-on: ubuntu-latest
+    needs: [build]
+    if: github.ref == 'refs/heads/main'
+    environment: production-web
+    steps:
+      - name: Deploy to web server
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.HOST }}
+          username: ${{ secrets.USERNAME }}
+          port: ${{ secrets.SSH_PORT }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          script: |
+            cd ${{ vars.DEPLOY_DIR }}
+            git pull origin main
+            cd production/web
+            docker-compose pull
+            docker-compose up -d
+            docker system prune -f
+
   deploy_public:
     runs-on: ubuntu-latest
     needs: [build]

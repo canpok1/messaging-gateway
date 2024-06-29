@@ -1,0 +1,12 @@
+version: "3.9"
+services:
+  migrate:
+    image: ghcr.io/canpok1/messaging-gateway/migrator:latest
+    env_file:
+      - ".env"
+    command: ["migrate-up"]
+
+networks:
+  default:
+    external:
+      name: common-database-network
