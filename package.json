@@ -23,7 +23,8 @@
   },
   "private": true,
   "workspaces": [
-    "packages/migrator"
+    "packages/migrator",
+    "packages/server"
   ],
   "devDependencies": {
     "dotenv-cli": "^7.4.2"

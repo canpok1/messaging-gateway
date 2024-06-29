@@ -6,6 +6,12 @@ services:
       - ".env"
     command: ["migrate-up"]
 
+  server:
+    image: ghcr.io/canpok1/messaging-gateway/server:latest
+    env_file:
+      - ".env"
+    restart: always
+
 networks:
   default:
     external:

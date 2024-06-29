@@ -122,7 +122,7 @@ jobs:
       contents: read
     strategy:
       matrix:
-        app: [migrator]
+        app: [migrator, server]
     steps:
       - uses: actions/checkout@v3
       - name: Log in to GitHub Container Registry
