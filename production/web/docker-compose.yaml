@@ -1,12 +1,14 @@
 version: "3.9"
 services:
-  migrate:
+  migrator:
+    container_name: messaging-gateway-migrator
     image: ghcr.io/canpok1/messaging-gateway/migrator:latest
     env_file:
       - ".env"
     command: ["migrate-up"]
 
   server:
+    container_name: messaging-gateway-server
     image: ghcr.io/canpok1/messaging-gateway/server:latest
     env_file:
       - ".env"
