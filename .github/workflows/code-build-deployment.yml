@@ -1,0 +1,167 @@
+name: code-build-deployment
+
+on:
+  push:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  code_test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Use Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v3
+        with:
+          node-version: 22.x
+          cache: "npm"
+          cache-dependency-path: "**/package-lock.json"
+
+      - uses: actions/cache/restore@v3
+        id: cache
+        with:
+          path: |
+            **/node_modules
+          key: ${{ hashFiles('**/package-lock.json') }}
+
+      - run: npm ci
+
+      # - run: npm run -w lib build
+
+      - run: npm run test:coverage
+
+      - run: npm run typecheck
+
+      - run: npm run lint
+
+      - name: archive coverage reports
+        uses: actions/upload-artifact@v3
+        with:
+          name: coverage-reports
+          path: public/coverage
+
+      - uses: actions/cache/save@v3
+        if: always()
+        with:
+          path: |
+            **/node_modules
+          key: ${{ steps.cache.outputs.cache-primary-key }}
+
+  db_test:
+    runs-on: ubuntu-latest
+    env:
+      MYSQL_DATABASE: messaging-gateway
+      MYSQL_USER: service
+      MYSQL_PASSWORD: password
+      MYSQL_HOST_ON_DOCKER_NETWORK: localhost
+      MYSQL_PORT_ON_DOCKER_NETWORK: 3306
+    services:
+      db:
+        image: mariadb:11.4
+        env:
+          MYSQL_RANDOM_ROOT_PASSWORD: "yes"
+          MYSQL_DATABASE: messaging-gateway
+          MYSQL_USER: service
+          MYSQL_PASSWORD: password
+        options: >-
+          --health-cmd "mysqladmin ping"
+          --health-interval 10s
+          --health-timeout 10s
+          --health-retries 5
+        ports:
+          - 3306:3306
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: install tbls command
+        env:
+          VERSION: 1.76.1
+        run: |
+          curl -o tbls.deb -L https://github.com/k1LoW/tbls/releases/download/v$VERSION/tbls_$VERSION-1_arm64.deb
+          dpkg -i tbls.deb
+          rm tbls.deb
+
+      - name: install migrate command
+        env:
+          VERSION: 4.17.1
+        run: |
+          curl -o migrate.deb -L https://github.com/golang-migrate/migrate/releases/download/v$VERSION/migrate.linux-arm64.deb
+          dpkg -i migrate.deb
+          rm migrate.deb
+
+      - name: test migrate up
+        working-directory: ./packages/migrator
+        run: make migrate-up
+
+      - name: lint for database
+        working-directory: ./packages/migrator
+        run: make tbls-lint
+
+      - name: make db document
+        working-directory: ./packages/migrator
+        run: make tbls-doc
+
+      - name: test migrate down all
+        working-directory: ./packages/migrator
+        run: make migrate options="down -all"
+
+      - name: archive db docs
+        uses: actions/upload-artifact@v3
+        with:
+          name: db-docs
+          path: public/database
+
+  build:
+    runs-on: ubuntu-latest
+    needs: [code_test, db_test]
+    permissions:
+      packages: write
+      contents: read
+    strategy:
+      matrix:
+        app: [migrator]
+    steps:
+      - uses: actions/checkout@v3
+      - name: Log in to GitHub Container Registry
+        uses: docker/login-action@v2
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+      - name: Build and push
+        uses: docker/build-push-action@v4
+        with:
+          context: .
+          file: packages/${{ matrix.app }}/Dockerfile
+          push: ${{ github.ref == 'refs/heads/main' }}
+          tags: |
+            ghcr.io/${{ github.repository }}/${{ matrix.app }}:latest
+
+  deploy_public:
+    runs-on: ubuntu-latest
+    needs: [build]
+    if: github.ref == 'refs/heads/main'
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Download coverage reports
+        uses: actions/download-artifact@v3
+        with:
+          name: coverage-reports
+          path: public/coverage
+
+      - name: Download db docs
+        uses: actions/download-artifact@v3
+        with:
+          name: db-docs
+          path: public/database
+
+      - name: Deploy to gh-pages
+        uses: peaceiris/actions-gh-pages@v3
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./public
+          enable_jekyll: true

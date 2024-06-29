@@ -1,0 +1,31 @@
+{
+  "name": "messaging-gateway",
+  "version": "1.0.0",
+  "directories": {
+    "doc": "docs"
+  },
+  "scripts": {
+    "lint": "npm run lint --workspaces --if-present",
+    "typecheck": "npm run typecheck --workspaces --if-present",
+    "test": "npm run test --workspaces --if-present",
+    "test:coverage": "npm run test:coverage --workspaces --if-present",
+    "clean": "npm run clean --workspaces --if-present",
+    "update-prisma-cli": "dotenv -e .devcontainer/db.env prisma db pull && prisma generate",
+    "migrate:version": "npm run -w migrator migrate:version",
+    "migrate:up:all": "npm run -w migrator migrate:up:all",
+    "migrate:up:one": "npm run -w migrator migrate:up:one",
+    "migrate:down:one": "npm run -w migrator migrate:down:one",
+    "migrate:force": "npm run -w migrator migrate:force",
+    "migrate:create": "npm run -w migrator migrate:create",
+    "tbls:doc": "npm run -w migrator tbls:doc",
+    "tbls:lint": "npm run -w migrator tbls:lint",
+    "tbls:diff": "npm run -w migrator tbls:diff"
+  },
+  "private": true,
+  "workspaces": [
+    "packages/migrator"
+  ],
+  "devDependencies": {
+    "dotenv-cli": "^7.4.2"
+  }
+}

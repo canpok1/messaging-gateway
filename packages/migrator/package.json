@@ -1,0 +1,16 @@
+{
+  "name": "migrator",
+  "version": "1.0.0",
+  "description": "",
+  "scripts": {
+    "migrate:version": "dotenv -e ../../.devcontainer/db.env make migrate-version",
+    "migrate:up:all": "dotenv -e ../../.devcontainer/db.env make migrate-up",
+    "migrate:up:one": "dotenv -e ../../.devcontainer/db.env make migrate-up-one",
+    "migrate:down:one": "dotenv -e ../../.devcontainer/db.env make migrate-down-one",
+    "migrate:force": "dotenv -e ../../.devcontainer/db.env make migrate-force-v v=${npm_config_v}",
+    "migrate:create": "make migrate-create name=${npm_config_name}",
+    "tbls:doc": "dotenv -e ../../.devcontainer/db.env make tbls-doc",
+    "tbls:lint": "dotenv -e ../../.devcontainer/db.env make tbls-lint",
+    "tbls:diff": "dotenv -e ../../.devcontainer/db.env make tbls-diff"
+  }
+}
