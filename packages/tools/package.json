@@ -1,0 +1,11 @@
+{
+  "name": "tools",
+  "version": "1.0.0",
+  "devDependencies": {
+    "ts-node": "^10.9.2"
+  },
+  "scripts": {
+    "generate-jwt": "ts-node src/JwtGenerator.ts"
+  },
+  "license": "ISC"
+}

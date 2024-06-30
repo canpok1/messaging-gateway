@@ -25,7 +25,8 @@
   "workspaces": [
     "packages/migrator",
     "packages/server",
-    "packages/lib"
+    "packages/lib",
+    "packages/tools"
   ],
   "devDependencies": {
     "@types/jest": "^29.5.12",

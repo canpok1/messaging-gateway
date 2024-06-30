@@ -1,7 +1,6 @@
 {
   "name": "lib",
   "version": "1.0.0",
-  "devDependencies": {},
   "scripts": {
     "build": "tsc",
     "clean": "rm -rf output && rm -f tsconfig.tsbuildinfo",
@@ -11,5 +10,11 @@
     "test:coverage": "jest --coverage"
   },
   "license": "ISC",
-  "description": ""
+  "description": "",
+  "dependencies": {
+    "node-jose": "^2.2.0"
+  },
+  "devDependencies": {
+    "@types/node-jose": "^1.1.13"
+  }
 }
