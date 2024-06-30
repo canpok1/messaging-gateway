@@ -24,9 +24,13 @@
   "private": true,
   "workspaces": [
     "packages/migrator",
-    "packages/server"
+    "packages/server",
+    "packages/lib"
   ],
   "devDependencies": {
-    "dotenv-cli": "^7.4.2"
+    "@types/jest": "^29.5.12",
+    "dotenv-cli": "^7.4.2",
+    "jest": "^29.7.0",
+    "ts-jest": "^29.1.5"
   }
 }

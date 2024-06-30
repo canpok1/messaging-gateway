@@ -1,0 +1,15 @@
+{
+  "name": "lib",
+  "version": "1.0.0",
+  "devDependencies": {},
+  "scripts": {
+    "build": "tsc",
+    "clean": "rm -rf output && rm -f tsconfig.tsbuildinfo",
+    "lint": "echo \"Warn: no lint specified\"",
+    "typecheck": "tsc --noEmit",
+    "test": "jest",
+    "test:coverage": "jest --coverage"
+  },
+  "license": "ISC",
+  "description": ""
+}
