@@ -1,3 +1,4 @@
+import * as line from "@line/bot-sdk";
 import jose from "node-jose";
 
 /**
@@ -37,4 +38,49 @@ export async function generateJwt(
     .final();
 
   return result.toString();
+}
+
+/**
+ * チャンネルアクセストークンの発行結果
+ */
+export interface IssueResult {
+  /**
+   * チャンネルアクセストークン
+   */
+  accessToken: string;
+
+  /**
+   * チャンネルアクセストークンの有効期限切れまでの秒数
+   */
+  expiresIn: number;
+
+  /**
+   * チャネルアクセストークンを識別するための一意のキーID
+   */
+  keyId: string;
+}
+
+/**
+ * チャンネルアクセストークンを発行する
+ * https://developers.line.biz/ja/reference/messaging-api/#issue-channel-access-token-v2-1
+ * @param jwt JWT
+ * @returns 発行した情報
+ */
+export async function issueChannelAccessToken(
+  jwt: string
+): Promise<IssueResult> {
+  const client = new line.channelAccessToken.ChannelAccessTokenClient({});
+
+  // 型定義はキャメルケースだが実際の値はスネークケースで返されるため、any型として受ける
+  const response = (await client.issueChannelTokenByJWT(
+    "client_credentials",
+    "urn:ietf:params:oauth:client-assertion-type:jwt-bearer",
+    jwt
+  )) as any;
+
+  return {
+    accessToken: response["access_token"] || response["accessToken"] || "",
+    expiresIn: response["expires_in"] || response["expiresIn"] || 0,
+    keyId: response["key_id"] || response["keyId"] || "",
+  };
 }

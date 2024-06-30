@@ -9,6 +9,20 @@ https://developers.line.biz/ja/docs/messaging-api/generate-json-web-token/#gener
 
 ### usage
 
+`packages/tools/.env-template` をコピーして `packages/tools/.env` を作成し、以下のコマンドを実行する。
+
 ```
-npm run -w tools generate-jwt {チャンネルID} {暗号鍵ファイルの絶対パス} {kid}
+npm run -w tools generate-jwt
+```
+
+## LineMessageSender
+
+LINE にメッセージを送信するツール。
+
+### usage
+
+`packages/tools/.env-template` をコピーして `packages/tools/.env` を作成し、以下のコマンドを実行する。
+
+```
+npm run -w tools send-line-message {送付先のユーザーID/グループID} {送付するメッセージ}
 ```

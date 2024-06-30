@@ -5,7 +5,8 @@
     "ts-node": "^10.9.2"
   },
   "scripts": {
-    "generate-jwt": "ts-node src/JwtGenerator.ts"
+    "generate-jwt": "dotenv -e .env ts-node src/JwtGenerator.ts",
+    "send-line-message": "dotenv -e .env ts-node src/LineMessageSender.ts"
   },
   "license": "ISC"
 }
