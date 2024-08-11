@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<coverage generated="1723393526114" clover="3.2.0">
-  <project timestamp="1723393526115" name="All files">
+<coverage generated="1723394069739" clover="3.2.0">
+  <project timestamp="1723394069740" name="All files">
     <metrics statements="52" coveredstatements="40" conditionals="11" coveredconditionals="1" methods="15" coveredmethods="13" elements="78" coveredelements="54" complexity="0" loc="52" ncloc="52" packages="1" files="3" classes="3"/>
     <file name="Encrypt.ts" path="/home/runner/work/messaging-gateway/messaging-gateway/packages/lib/src/Encrypt.ts">
       <metrics statements="32" coveredstatements="31" conditionals="1" coveredconditionals="0" methods="8" coveredmethods="8"/>
