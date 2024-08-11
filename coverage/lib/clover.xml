@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<coverage generated="1719721431152" clover="3.2.0">
-  <project timestamp="1719721431153" name="All files">
-    <metrics statements="45" coveredstatements="38" conditionals="1" coveredconditionals="0" methods="14" coveredmethods="13" elements="60" coveredelements="51" complexity="0" loc="45" ncloc="45" packages="1" files="3" classes="3"/>
+<coverage generated="1723392207884" clover="3.2.0">
+  <project timestamp="1723392207884" name="All files">
+    <metrics statements="52" coveredstatements="40" conditionals="11" coveredconditionals="1" methods="15" coveredmethods="13" elements="78" coveredelements="54" complexity="0" loc="52" ncloc="52" packages="1" files="3" classes="3"/>
     <file name="Encrypt.ts" path="/home/runner/work/messaging-gateway/messaging-gateway/packages/lib/src/Encrypt.ts">
       <metrics statements="32" coveredstatements="31" conditionals="1" coveredconditionals="0" methods="8" coveredmethods="8"/>
       <line num="1" count="1" type="stmt"/>
@@ -38,23 +38,30 @@
       <line num="100" count="1" type="stmt"/>
     </file>
     <file name="Line.ts" path="/home/runner/work/messaging-gateway/messaging-gateway/packages/lib/src/Line.ts">
-      <metrics statements="6" coveredstatements="0" conditionals="0" coveredconditionals="0" methods="1" coveredmethods="0"/>
+      <metrics statements="11" coveredstatements="0" conditionals="9" coveredconditionals="0" methods="2" coveredmethods="0"/>
       <line num="1" count="0" type="stmt"/>
-      <line num="12" count="0" type="stmt"/>
-      <line num="18" count="0" type="stmt"/>
-      <line num="24" count="0" type="stmt"/>
-      <line num="32" count="0" type="stmt"/>
-      <line num="39" count="0" type="stmt"/>
+      <line num="2" count="0" type="stmt"/>
+      <line num="13" count="0" type="stmt"/>
+      <line num="19" count="0" type="stmt"/>
+      <line num="25" count="0" type="stmt"/>
+      <line num="33" count="0" type="stmt"/>
+      <line num="40" count="0" type="stmt"/>
+      <line num="69" count="0" type="stmt"/>
+      <line num="72" count="0" type="stmt"/>
+      <line num="75" count="0" type="stmt"/>
+      <line num="81" count="0" type="stmt"/>
     </file>
     <file name="Secret.ts" path="/home/runner/work/messaging-gateway/messaging-gateway/packages/lib/src/Secret.ts">
-      <metrics statements="7" coveredstatements="7" conditionals="0" coveredconditionals="0" methods="5" coveredmethods="5"/>
+      <metrics statements="9" coveredstatements="9" conditionals="1" coveredconditionals="1" methods="5" coveredmethods="5"/>
       <line num="1" count="2" type="stmt"/>
-      <line num="5" count="22" type="stmt"/>
-      <line num="9" count="11" type="stmt"/>
-      <line num="13" count="7" type="stmt"/>
-      <line num="17" count="7" type="stmt"/>
-      <line num="21" count="14" type="stmt"/>
-      <line num="22" count="14" type="stmt"/>
+      <line num="5" count="25" type="stmt"/>
+      <line num="9" count="12" type="stmt"/>
+      <line num="13" count="8" type="stmt"/>
+      <line num="17" count="8" type="stmt"/>
+      <line num="21" count="16" type="stmt"/>
+      <line num="22" count="16" type="cond" truecount="1" falsecount="0"/>
+      <line num="23" count="4" type="stmt"/>
+      <line num="25" count="16" type="stmt"/>
     </file>
   </project>
 </coverage>
