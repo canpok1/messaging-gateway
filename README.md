@@ -29,4 +29,7 @@ npm -w tools run send-line-message {userID} {message}
 
 # encrypt text
 npm -w tools run encrypt {text}
+
+# decrypt text
+npm -w tools run decrypt {text}
 ```
