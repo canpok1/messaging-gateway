@@ -4,6 +4,7 @@ WORKDIR /src
 COPY ./package*.json ./
 COPY ./packages/lib/package*.json ./packages/lib/
 COPY ./packages/server/package*.json ./packages/server/
+COPY ./prisma/ ./prisma/
 RUN npm ci
 
 COPY ./tsconfig.json ./
