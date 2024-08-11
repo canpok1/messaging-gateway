@@ -1,5 +1,5 @@
 {
-  "name": "migrator",
+  "name": "@messaging-gateway/migrator",
   "version": "1.0.0",
   "description": "",
   "scripts": {

@@ -1,0 +1,23 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DB_URL_FOR_PRISMA")
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model line_channels {
+  id                   String   @id @db.VarChar(256)
+  encrypted_secret_key String   @db.Text
+  kid                  String   @db.Text
+  memo                 String?  @db.Text
+  created_at           DateTime @default(now()) @db.DateTime(0)
+  updated_at           DateTime @default(now()) @db.DateTime(0)
+}
+
+model schema_migrations {
+  version BigInt  @id
+  dirty   Boolean
+}

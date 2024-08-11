@@ -1,5 +1,5 @@
 {
-  "name": "lib",
+  "name": "@messaging-gateway/lib",
   "version": "1.0.0",
   "scripts": {
     "build": "tsc",
@@ -9,6 +9,8 @@
     "test": "jest",
     "test:coverage": "jest --coverage"
   },
+  "main": "./output/Index.js",
+  "types": "./output/Index.d.ts",
   "license": "ISC",
   "description": "",
   "dependencies": {
