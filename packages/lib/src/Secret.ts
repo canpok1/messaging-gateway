@@ -18,7 +18,10 @@ export class SecretString {
   }
 
   private mask(): string {
-    const unmaskedLength = Math.max(this._value.length - 3, 0);
-    return this._value.substring(0, unmaskedLength) + "**********";
+    let unmasked = "";
+    if (this._value.length >= 6) {
+      unmasked = this._value.substring(0, 3);
+    }
+    return unmasked + "**********";
   }
 }

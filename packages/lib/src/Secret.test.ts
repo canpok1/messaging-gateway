@@ -3,13 +3,14 @@ import { SecretString } from "./Secret";
 describe("SecretStringクラス", () => {
   describe("value()", () => {
     it.each`
-      org         | expected
-      ${"x"}      | ${"x"}
-      ${"xx"}     | ${"xx"}
-      ${"xxx"}    | ${"xxx"}
-      ${"xxxx"}   | ${"xxxx"}
-      ${"xxxxx"}  | ${"xxxxx"}
-      ${"xxxxxx"} | ${"xxxxxx"}
+      org          | expected
+      ${"x"}       | ${"x"}
+      ${"xx"}      | ${"xx"}
+      ${"xxx"}     | ${"xxx"}
+      ${"xxxx"}    | ${"xxxx"}
+      ${"xxxxx"}   | ${"xxxxx"}
+      ${"xxxxxx"}  | ${"xxxxxx"}
+      ${"xxxxxxx"} | ${"xxxxxxx"}
     `("$orgは$expectedとして取得できること", ({ org, expected }) => {
       const s = new SecretString(org);
       expect(s.value()).toEqual(expected);
@@ -18,13 +19,14 @@ describe("SecretStringクラス", () => {
 
   describe("toString()", () => {
     it.each`
-      org         | expected
-      ${"x"}      | ${"**********"}
-      ${"xx"}     | ${"**********"}
-      ${"xxx"}    | ${"**********"}
-      ${"xxxx"}   | ${"x**********"}
-      ${"xxxxx"}  | ${"xx**********"}
-      ${"xxxxxx"} | ${"xxx**********"}
+      org          | expected
+      ${"x"}       | ${"**********"}
+      ${"xx"}      | ${"**********"}
+      ${"xxx"}     | ${"**********"}
+      ${"xxxx"}    | ${"**********"}
+      ${"xxxxx"}   | ${"**********"}
+      ${"xxxxxx"}  | ${"xxx**********"}
+      ${"xxxxxxx"} | ${"xxx**********"}
     `("$orgが$expectedに変換されること", ({ org, expected }) => {
       const s = new SecretString(org);
       expect(s.toString()).toEqual(expected);
@@ -33,13 +35,14 @@ describe("SecretStringクラス", () => {
 
   describe("toJSON()", () => {
     it.each`
-      org         | expected
-      ${"x"}      | ${"**********"}
-      ${"xx"}     | ${"**********"}
-      ${"xxx"}    | ${"**********"}
-      ${"xxxx"}   | ${"x**********"}
-      ${"xxxxx"}  | ${"xx**********"}
-      ${"xxxxxx"} | ${"xxx**********"}
+      org          | expected
+      ${"x"}       | ${"**********"}
+      ${"xx"}      | ${"**********"}
+      ${"xxx"}     | ${"**********"}
+      ${"xxxx"}    | ${"**********"}
+      ${"xxxxx"}   | ${"**********"}
+      ${"xxxxxx"}  | ${"xxx**********"}
+      ${"xxxxxxx"} | ${"xxx**********"}
     `("$orgが$expectedに変換されること", ({ org, expected }) => {
       const s = new SecretString(org);
       expect(s.toJSON()).toEqual(expected);
