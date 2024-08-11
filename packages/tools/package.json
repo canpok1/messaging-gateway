@@ -6,7 +6,8 @@
   },
   "scripts": {
     "generate-jwt": "dotenv -e .env ts-node src/JwtGenerator.ts",
-    "send-line-message": "dotenv -e .env ts-node src/LineMessageSender.ts"
+    "send-line-message": "dotenv -e .env ts-node src/LineMessageSender.ts",
+    "encrypt": "dotenv -e .env ts-node src/Encryptor.ts"
   },
   "license": "ISC"
 }

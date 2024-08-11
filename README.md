@@ -20,3 +20,13 @@ npm run tbls:doc
 npm run tbls:lint
 npm run tbls:diff
 ```
+
+## tools
+
+```
+# send line message
+npm -w tools run send-line-message {userID} {message}
+
+# encrypt text
+npm -w tools run encrypt {text}
+```
