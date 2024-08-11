@@ -19,6 +19,11 @@ WORKDIR /service
 
 COPY --from=builder /src/packages/server/.next/standalone ./
 
+RUN apt-get update && apt-get install -y \
+    openssl \
+ && apt-get clean \
+ && rm -rf /var/lib/apt/lists/*
+
 ENV TZ=Asia/Tokyo
 ENV NODE_ENV production
 ENV PORT=3000
