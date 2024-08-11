@@ -9,8 +9,8 @@ RUN npm ci
 COPY ./tsconfig.json ./
 COPY ./packages/lib/ ./packages/lib/
 COPY ./packages/server/ ./packages/server/
-RUN npm run -w lib build
-RUN npm run -w server build
+RUN npm run -w packages/lib build
+RUN npm run -w packages/server build
 
 
 FROM node:22-slim
