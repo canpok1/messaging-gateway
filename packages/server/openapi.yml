@@ -1,0 +1,114 @@
+openapi: "3.0.3"
+info:
+  title: messaging-gateway server
+  version: "1.0"
+servers:
+  - url: http://localhost:3000
+    description: local server
+paths:
+  /api/line/v2/bot/message/push:
+    post:
+      description: |
+        LINEにプッシュメッセージを送信する。
+        LINEのMessaging APIを利用しているため詳細はLINEのドキュメントを参照。
+        - [Messaging API | チャンネルアクセストークンv2.1を発行する](https://developers.line.biz/ja/reference/messaging-api/#issue-channel-access-token-v2-1)
+        - [Messaging API | プッシュメッセージを送る](https://developers.line.biz/ja/reference/messaging-api/#send-push-message)
+      parameters:
+        - in: header
+          name: X-MessagingGateway-Line-Channel-Id
+          description: LINEチャンネルID。
+          required: true
+          schema:
+            type: string
+      requestBody:
+        description: |
+          送信するメッセージ内容。
+          Messaging API準拠。
+          - [Messaging API | プッシュメッセージを送る | リクエストボディ](https://developers.line.biz/ja/reference/messaging-api/#send-push-message-request-body)
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                to:
+                  description: |
+                    送信先のID。
+                    Webhookイベントオブジェクトで返される `userId` `groupId` `roomId` のいずれかの値。
+                  type: string
+                messages:
+                  description: |
+                    送信するメッセージ。
+                    最大5件。
+                  type: array
+                  items:
+                    $ref: "#/components/schemas/MessageObject"
+                notificationDisabled:
+                  description: |
+                    メッセージ送信時のユーザー通知有無。デフォルトは`false`。
+                  type: boolean
+                customAggregationUnits:
+                  description: |
+                    任意の集計単位のユニット名。
+                  type: array
+                  items: { type: string }
+              required:
+                - to
+                - messages
+      responses:
+        "200":
+          description: |
+            メッセージ送信成功。Messaging APIのレスポンスをそのまま返却します。
+            - [Messaging API | プッシュメッセージを送る | レスポンス](https://developers.line.biz/ja/reference/messaging-api/#send-push-message-response)
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  sentMessages:
+                    description: 送信したメッセージの配列。
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/SentMessageObject"
+        "400":
+          description: |
+            メッセージ送信に失敗。
+            - LINEチャンネルIDが存在しない。
+            - LINE Messaging API が 400 を返した。
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorObject"
+        "429":
+          description: |
+            リクエスト数が上限を超過した。
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorObject"
+components:
+  schemas:
+    MessageObject:
+      description: |
+        メッセージ情報。LINE Messaging API に準拠。
+        - [Messaging API | メッセージオブジェクト](https://developers.line.biz/ja/reference/messaging-api/#message-objects)
+      type: object
+    SentMessageObject:
+      description: 送信したメッセージ情報。
+      type: object
+      properties:
+        id:
+          description: 送信したメッセージのID。
+          type: number
+        quoteToken:
+          description: メッセージの引用トークン。
+          type: string
+      required:
+        - id
+    ErrorObject:
+      description: エラー情報。
+      type: object
+      properties:
+        message: { type: string }
+      required:
+        - message
