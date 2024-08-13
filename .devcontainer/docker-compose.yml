@@ -1,7 +1,7 @@
 version: "3.9"
 services:
   dev:
-    container_name: dev
+    container_name: messaging-gateway_dev
     build:
       context: .
       dockerfile: Dockerfile-dev
@@ -17,7 +17,7 @@ services:
       - "host.docker.internal:host-gateway"
 
   db:
-    container_name: db
+    container_name: messaging-gateway_db
     image: "mariadb:11.4"
     environment:
       MYSQL_RANDOM_ROOT_PASSWORD: "yes"
