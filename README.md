@@ -33,3 +33,7 @@ npm -w tools run encrypt {text}
 # decrypt text
 npm -w tools run decrypt {text}
 ```
+
+## Other docs
+
+- [その他ドキュメント](https://ktnet.info/messaging-gateway/)

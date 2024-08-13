@@ -1,7 +1,0 @@
-{
-  "preset": "ts-jest",
-  "testEnvironment": "node",
-  "collectCoverageFrom": ["./src/**/*.ts"],
-  "coverageDirectory": "../../public/coverage/lib",
-  "coveragePathIgnorePatterns": ["Index.ts"]
-}

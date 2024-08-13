@@ -6,8 +6,8 @@
     "clean": "rm -rf output && rm -f tsconfig.tsbuildinfo",
     "lint": "echo \"Warn: no lint specified\"",
     "typecheck": "tsc --noEmit",
-    "test": "jest",
-    "test:coverage": "jest --coverage"
+    "test": "vitest",
+    "test:coverage": "vitest run --coverage"
   },
   "main": "./src/Index.ts",
   "types": "./src/Index.ts",
