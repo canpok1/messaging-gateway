@@ -9,5 +9,6 @@
     "declarationMap": true,
     "sourceMap": true,
     "composite": true
-  }
+  },
+  "include": ["src"]
 }
