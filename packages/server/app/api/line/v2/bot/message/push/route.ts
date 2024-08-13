@@ -7,37 +7,47 @@ import {
 import { PrismaClient } from "@prisma/client";
 import { NextRequest, NextResponse } from "next/server";
 import { messagingApi } from "@line/bot-sdk";
+import type { ErrorObject } from "@/app/types/api";
 
 const encryptionPassword = new SecretString(
   process.env.ENCRYPTION_PASSWORD || ""
 );
 
 export async function POST(req: NextRequest) {
-  const channelId = req.headers.get("X-MessagingGateway-Line-Channel-Id");
-  const body = (await req.json()) as messagingApi.PushMessageRequest;
-
-  console.log("received request: " + JSON.stringify({ channelId, body: body }));
-
   try {
+    const channelId = req.headers.get("X-MessagingGateway-Line-Channel-Id");
+    const body = (await req.json()) as messagingApi.PushMessageRequest;
+
+    console.log(
+      "received request: " + JSON.stringify({ channelId, body: body })
+    );
+
+    if (!channelId) {
+      const errObj: ErrorObject = {
+        message: "X-MessagingGateway-Line-Channel-Id is empty or not exists",
+      };
+      return NextResponse.json(errObj, { status: 400 });
+    }
+
     const res = await sendMessage(channelId, body);
     console.log(res);
-    return NextResponse.json(res, { status: 200 });
-  } catch (err) {
-    if (err instanceof Error) {
-      return NextResponse.json({ message: err.message }, { status: 400 });
+    if (typeof res === "string") {
+      const errObj: ErrorObject = { message: res };
+      return NextResponse.json(errObj, { status: 400 });
     } else {
-      return NextResponse.json(
-        { message: "internal server error" },
-        { status: 500 }
-      );
+      return NextResponse.json(res, { status: 200 });
     }
+  } catch (err) {
+    console.log(err);
+    const errObj: ErrorObject = { message: "internal server error" };
+    return NextResponse.json(errObj, { status: 500 });
   }
 }
 
 async function sendMessage(
   channelId: string,
   body: messagingApi.PushMessageRequest
-): Promise<messagingApi.PushMessageResponse> {
+): Promise<messagingApi.PushMessageResponse | string> {
   const prisma = new PrismaClient();
   const lineChannel = await prisma.line_channels.findUnique({
     where: {
@@ -48,7 +58,7 @@ async function sendMessage(
     console.log(
       `failed to find lineChannel, channel(id=${channelId}) is not found`
     );
-    throw new Error(`channel(id=${channelId}) is not found`);
+    return `channel(id=${channelId}) is not found`;
   }
   console.log(`found lineChannel, id=${channelId}`);
 
@@ -70,7 +80,7 @@ async function sendMessage(
     accessToken = result.accessToken;
   } catch (err) {
     console.log(err);
-    throw new Error("failed to issue channel access token");
+    return "failed to issue channel access token";
   }
   console.log("accessToken:" + accessToken);
 
@@ -81,6 +91,6 @@ async function sendMessage(
     return await client.pushMessage(body);
   } catch (err) {
     console.log(err);
-    throw new Error("failed to push message");
+    return "failed to push message";
   }
 }

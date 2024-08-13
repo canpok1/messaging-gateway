@@ -29,6 +29,11 @@ jobs:
 
       - run: npm ci
 
+      - name: Open API Doc update check
+        run: |
+          npm -w packages/server run generate:api
+          git diff --exit-code
+
       - run: npm run -w packages/lib build
 
       - run: npm run test:coverage

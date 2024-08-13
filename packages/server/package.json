@@ -7,7 +7,8 @@
     "build": "next build",
     "start": "dotenv -e ../../.devcontainer/db.env -e .env next start",
     "lint": "next lint",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "generate:api": "npx openapi-typescript ./openapi.yml -o ./app/types/api.gen.ts"
   },
   "dependencies": {
     "@messaging-gateway/lib": "file:../lib",
