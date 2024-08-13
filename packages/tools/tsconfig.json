@@ -3,8 +3,6 @@
   "compilerOptions": {
     "rootDir": "src",
     "outDir": "output",
-    "target": "es2020",
-    "module": "commonjs",
     "forceConsistentCasingInFileNames": true,
     "strict": true,
     "declaration": true,

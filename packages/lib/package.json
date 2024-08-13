@@ -9,8 +9,8 @@
     "test": "jest",
     "test:coverage": "jest --coverage"
   },
-  "main": "./output/Index.js",
-  "types": "./output/Index.d.ts",
+  "main": "./src/Index.ts",
+  "types": "./src/Index.ts",
   "license": "ISC",
   "description": "",
   "dependencies": {

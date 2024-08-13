@@ -6,7 +6,8 @@
     "dev": "dotenv -e ../../.devcontainer/db.env -e .env next dev",
     "build": "next build",
     "start": "dotenv -e ../../.devcontainer/db.env -e .env next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "typecheck": "tsc --noEmit"
   },
   "dependencies": {
     "@messaging-gateway/lib": "file:../lib",

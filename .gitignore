@@ -11,3 +11,6 @@ node_modules/
 # generated doc
 public/database/
 public/coverage/
+
+# TypeScript build info files
+*.tsbuildinfo

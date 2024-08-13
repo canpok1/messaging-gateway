@@ -5,8 +5,6 @@
     "allowJs": true,
     "strict": false,
     "noEmit": true,
-    "module": "esnext",
-    "moduleResolution": "node",
     "isolatedModules": true,
     "jsx": "preserve",
     "plugins": [

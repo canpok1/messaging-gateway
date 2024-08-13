@@ -1,12 +1,12 @@
-import { generateJwt, issueChannelAccessToken } from "../../lib/src/Line";
+import { generateJwt, issueChannelAccessToken } from "@messaging-gateway/lib";
 import * as fs from "fs";
 import * as line from "@line/bot-sdk";
 
 (async () => {
-  const userId = process.argv[2];
+  const userId = process.argv[2] || "";
   const message: line.messagingApi.TextMessage = {
     type: "text",
-    text: process.argv[3],
+    text: process.argv[3] || "",
   };
 
   const channelId = process.env.LINE_CHANNEL_ID || "";

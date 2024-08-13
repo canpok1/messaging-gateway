@@ -1,4 +1,4 @@
-import { generateJwt } from "../../lib/src/Line";
+import { generateJwt } from "@messaging-gateway/lib";
 import * as fs from "fs";
 
 (async () => {

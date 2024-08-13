@@ -1,7 +1,7 @@
-import { EncryptedValue, SecretString } from "../../lib/src/Index";
+import { EncryptedValue, SecretString } from "@messaging-gateway/lib";
 
 (async () => {
-  const text = process.argv[2];
+  const text = process.argv[2] || "";
   const encrypted = EncryptedValue.makeFromSerializedText(text);
   const password = new SecretString(process.env.ENCRYPTION_PASSWORD || "");
   const decrypted = encrypted.decrypt(password);
