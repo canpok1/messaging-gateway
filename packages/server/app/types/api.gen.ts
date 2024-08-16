@@ -104,7 +104,7 @@ export interface components {
         /** @description メッセージ情報。LINE Messaging API に準拠。
          *     - [Messaging API | メッセージオブジェクト](https://developers.line.biz/ja/reference/messaging-api/#message-objects)
          *      */
-        MessageObject: Record<string, never>;
+        MessageObject: unknown;
         /** @description 送信したメッセージ情報。 */
         SentMessageObject: {
             /** @description 送信したメッセージのID。 */

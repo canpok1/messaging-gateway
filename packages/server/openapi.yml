@@ -92,7 +92,6 @@ components:
       description: |
         メッセージ情報。LINE Messaging API に準拠。
         - [Messaging API | メッセージオブジェクト](https://developers.line.biz/ja/reference/messaging-api/#message-objects)
-      type: object
     SentMessageObject:
       description: 送信したメッセージ情報。
       type: object
