@@ -12,10 +12,9 @@ import { v4 as uuidv4 } from "uuid";
 
 import type { ErrorObject } from "@/types/api";
 
-const env = new Env(process.env);
-
 export async function POST(req: NextRequest) {
   const requestId = uuidv4();
+  const env = new Env(process.env);
   const logger = createLogger(env, { requestId });
   try {
     const channelId = req.headers.get("X-MessagingGateway-Line-Channel-Id");
@@ -31,7 +30,7 @@ export async function POST(req: NextRequest) {
     }
 
     const childLogger = logger.child({ channelId });
-    const res = await sendMessage(channelId, body, childLogger);
+    const res = await sendMessage(env, channelId, body, childLogger);
     if (typeof res === "string") {
       const errObj: ErrorObject = { message: res };
       return NextResponse.json(errObj, { status: 400 });
@@ -48,6 +47,7 @@ export async function POST(req: NextRequest) {
 }
 
 async function sendMessage(
+  env: Env,
   channelId: string,
   body: messagingApi.PushMessageRequest,
   logger: Logger

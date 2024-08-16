@@ -17,12 +17,12 @@ RUN npm run -w packages/server build
 FROM node:22-slim
 WORKDIR /service
 
-COPY --from=builder /src/packages/server/.next/standalone ./
-
 RUN apt-get update && apt-get install -y \
     openssl \
  && apt-get clean \
  && rm -rf /var/lib/apt/lists/*
+
+COPY --from=builder /src/packages/server/.next/standalone ./
 
 ENV TZ=Asia/Tokyo
 ENV NODE_ENV production
