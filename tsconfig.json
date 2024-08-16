@@ -8,6 +8,7 @@
     "module": "ESNext",
     "moduleResolution": "Bundler",
     "noUncheckedIndexedAccess": true,
-    "types": ["vitest/globals"]
+    "types": ["vitest/globals"],
+    "sourceMap": true
   }
 }

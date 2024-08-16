@@ -2,25 +2,26 @@ import {
   EncryptedValue,
   generateJwt,
   issueChannelAccessToken,
-  SecretString,
 } from "@messaging-gateway/lib";
 import { PrismaClient } from "@prisma/client";
 import { NextRequest, NextResponse } from "next/server";
-import { messagingApi } from "@line/bot-sdk";
-import type { ErrorObject } from "@/app/types/api";
+import { messagingApi, HTTPFetchError } from "@line/bot-sdk";
+import { Env } from "@/utils/Env";
+import { createLogger, Logger } from "@/utils/Logger";
+import { v4 as uuidv4 } from "uuid";
 
-const encryptionPassword = new SecretString(
-  process.env.ENCRYPTION_PASSWORD || ""
-);
+import type { ErrorObject } from "@/types/api";
+
+const env = new Env(process.env);
 
 export async function POST(req: NextRequest) {
+  const requestId = uuidv4();
+  const logger = createLogger(env, { requestId });
   try {
     const channelId = req.headers.get("X-MessagingGateway-Line-Channel-Id");
     const body = (await req.json()) as messagingApi.PushMessageRequest;
 
-    console.log(
-      "received request: " + JSON.stringify({ channelId, body: body })
-    );
+    logger.info("received request", { channelId, body });
 
     if (!channelId) {
       const errObj: ErrorObject = {
@@ -29,24 +30,27 @@ export async function POST(req: NextRequest) {
       return NextResponse.json(errObj, { status: 400 });
     }
 
-    const res = await sendMessage(channelId, body);
-    console.log(res);
+    const childLogger = logger.child({ channelId });
+    const res = await sendMessage(channelId, body, childLogger);
     if (typeof res === "string") {
       const errObj: ErrorObject = { message: res };
       return NextResponse.json(errObj, { status: 400 });
     } else {
+      childLogger.info("success to send message");
       return NextResponse.json(res, { status: 200 });
     }
   } catch (err) {
-    console.log(err);
-    const errObj: ErrorObject = { message: "internal server error" };
+    const msg = "internal server error";
+    logger.error(msg, { err });
+    const errObj: ErrorObject = { message: msg };
     return NextResponse.json(errObj, { status: 500 });
   }
 }
 
 async function sendMessage(
   channelId: string,
-  body: messagingApi.PushMessageRequest
+  body: messagingApi.PushMessageRequest,
+  logger: Logger
 ): Promise<messagingApi.PushMessageResponse | string> {
   const prisma = new PrismaClient();
   const lineChannel = await prisma.line_channels.findUnique({
@@ -55,45 +59,41 @@ async function sendMessage(
     },
   });
   if (!lineChannel) {
-    console.log(
-      `failed to find lineChannel, channel(id=${channelId}) is not found`
-    );
+    logger.error("failed to find lineChannel, channel is not found");
     return `channel(id=${channelId}) is not found`;
   }
-  console.log(`found lineChannel, id=${channelId}`);
+  logger.debug("found lineChannel record");
 
   const encryptedSecretKey = EncryptedValue.makeFromSerializedText(
     lineChannel.encrypted_secret_key
   );
 
-  const secretKey = encryptedSecretKey.decrypt(encryptionPassword);
-  console.log(`decrypted secret key: ${secretKey.value()}`);
+  const secretKey = encryptedSecretKey.decrypt(env.encryptionPassword);
+  logger.debug("decrypted secret key");
 
   const kid = lineChannel.kid;
   const tokenExpSec = 60 * 1;
   const jwt = await generateJwt(channelId, secretKey.value(), kid, tokenExpSec);
-  console.log("generated jwt: " + jwt);
+  logger.debug("generated jwt");
 
   let accessToken: string;
   try {
     const result = await issueChannelAccessToken(jwt);
     accessToken = result.accessToken;
   } catch (err) {
-    console.log(err);
     let msg = "failed to issue channel access token";
-    try {
-      if (err.body) {
+    if (err instanceof HTTPFetchError) {
+      try {
         const body = JSON.parse(err.body);
-        if (body.error_description) {
-          msg += ", " + body.error_description;
-        }
+        msg += `, ${body.error}(${body.error_description})`;
+      } catch (err) {
+        logger.warn("failed to parse response", { err });
       }
-    } catch (err) {
-      console.log(`failed to parse reponse, ${err}`);
     }
+    logger.error(msg, { err });
     return msg;
   }
-  console.log("accessToken:" + accessToken);
+  logger.debug("issued channel access token");
 
   const client = new messagingApi.MessagingApiClient({
     channelAccessToken: accessToken,
@@ -101,19 +101,19 @@ async function sendMessage(
   try {
     return await client.pushMessage(body);
   } catch (err) {
-    console.log(err);
     let msg = "failed to push message";
     try {
-      if (err.body) {
-        const body = JSON.parse(err.body);
+      if (err instanceof HTTPFetchError) {
+        const body = JSON.parse(err.body) as messagingApi.ErrorResponse;
         for (const detail of body.details) {
           msg += `, ${detail.message}(${detail.property})`;
         }
       }
     } catch (err) {
-      console.log(`failed to parse response, ${err}`);
+      logger.warn("failed to parse response", { err });
     }
 
+    logger.error(msg, { err });
     return msg;
   }
 }
