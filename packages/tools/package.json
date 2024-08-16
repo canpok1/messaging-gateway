@@ -1,15 +1,16 @@
 {
   "name": "@messaging-gateway/tools",
   "version": "1.0.0",
+  "type": "module",
   "devDependencies": {
     "@messaging-gateway/lib": "file:../lib",
-    "ts-node": "^10.9.2"
+    "tsx": "^4.17.0"
   },
   "scripts": {
-    "generate-jwt": "dotenv -e .env ts-node src/JwtGenerator.ts",
-    "send-line-message": "dotenv -e .env ts-node src/LineMessageSender.ts",
-    "encrypt": "dotenv -e .env ts-node src/Encryptor.ts",
-    "decrypt": "dotenv -e .env ts-node src/Decryptor.ts",
+    "generate-jwt": "dotenv -e .env tsx src/JwtGenerator.ts",
+    "send-line-message": "dotenv -e .env tsx src/LineMessageSender.ts",
+    "encrypt": "dotenv -e .env tsx src/Encryptor.ts",
+    "decrypt": "dotenv -e .env tsx src/Decryptor.ts",
     "typecheck": "tsc --noEmit"
   },
   "license": "ISC"

@@ -1,6 +1,7 @@
 {
   "name": "@messaging-gateway/lib",
   "version": "1.0.0",
+  "type": "module",
   "scripts": {
     "build": "tsc",
     "clean": "rm -rf output && rm -f tsconfig.tsbuildinfo",

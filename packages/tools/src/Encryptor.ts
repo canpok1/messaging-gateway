@@ -1,10 +1,10 @@
 import { EncryptedValue, SecretString } from "@messaging-gateway/lib";
+import { readFileSync } from "fs";
 
 (async () => {
-  const originalText = process.argv[2] || "";
+  const inputText = readFileSync(process.stdin.fd, "utf8");
   const password = new SecretString(process.env.ENCRYPTION_PASSWORD || "");
-  const encrypted = EncryptedValue.makeFromPlainText(originalText, password);
+  const encrypted = EncryptedValue.makeFromPlainText(inputText, password);
 
-  console.log(`original: ${originalText}`);
-  console.log(`encrypted: ${encrypted.serialize()}`);
+  console.log(encrypted.serialize());
 })();
