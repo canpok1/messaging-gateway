@@ -80,7 +80,18 @@ async function sendMessage(
     accessToken = result.accessToken;
   } catch (err) {
     console.log(err);
-    return "failed to issue channel access token";
+    let msg = "failed to issue channel access token";
+    try {
+      if (err.body) {
+        const body = JSON.parse(err.body);
+        if (body.error_description) {
+          msg += ", " + body.error_description;
+        }
+      }
+    } catch (err) {
+      console.log(`failed to parse reponse, ${err}`);
+    }
+    return msg;
   }
   console.log("accessToken:" + accessToken);
 
@@ -91,6 +102,18 @@ async function sendMessage(
     return await client.pushMessage(body);
   } catch (err) {
     console.log(err);
-    return "failed to push message";
+    let msg = "failed to push message";
+    try {
+      if (err.body) {
+        const body = JSON.parse(err.body);
+        for (const detail of body.details) {
+          msg += `, ${detail.message}(${detail.property})`;
+        }
+      }
+    } catch (err) {
+      console.log(`failed to parse response, ${err}`);
+    }
+
+    return msg;
   }
 }
