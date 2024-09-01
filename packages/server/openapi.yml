@@ -98,7 +98,7 @@ components:
       properties:
         id:
           description: 送信したメッセージのID。
-          type: number
+          type: string
         quoteToken:
           description: メッセージの引用トークン。
           type: string
