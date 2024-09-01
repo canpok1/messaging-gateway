@@ -108,7 +108,7 @@ export interface components {
         /** @description 送信したメッセージ情報。 */
         SentMessageObject: {
             /** @description 送信したメッセージのID。 */
-            id: number;
+            id: string;
             /** @description メッセージの引用トークン。 */
             quoteToken?: string;
         };
