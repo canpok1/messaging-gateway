@@ -6,24 +6,16 @@ import { v4 as uuidv4 } from "uuid";
 
 import type { ErrorObject } from "@/types/api";
 
-export async function POST(
-  req: NextRequest,
-  { params }: { params: { id: string } }
-) {
+export async function POST(req: NextRequest) {
   const requestId = uuidv4();
   const env = new Env(process.env);
   const logger = createLogger(env, { requestId });
   try {
     const body = (await req.json()) as messagingApi.PushMessageRequest;
 
-    logger.info("received request", { id: params.id, body });
+    logger.info("received request", { body });
 
-    return NextResponse.json(
-      {
-        id: params.id,
-      },
-      { status: 200 }
-    );
+    return NextResponse.json({}, { status: 200 });
   } catch (err) {
     const msg = "internal server error";
     logger.error(msg, { err });
