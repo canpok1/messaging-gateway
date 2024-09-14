@@ -13,4 +13,5 @@ RUN curl -o tbls.deb -L https://github.com/k1LoW/tbls/releases/download/v$TBLS_V
 
 RUN apt update && apt install -y \
   fonts-ipafont-gothic \
-  fonts-ipafont-mincho
+  fonts-ipafont-mincho \
+  redis-tools
