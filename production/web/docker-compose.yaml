@@ -11,7 +11,7 @@ services:
     container_name: messaging-gateway-server
     image: ghcr.io/canpok1/messaging-gateway/server:latest
     environment:
-      - APP_NAME=messaging-gateway-notifier-prd
+      - APP_NAME=messaging-gateway-server-prd
       - LOG_LEVEL=info
     env_file:
       - ".env"
