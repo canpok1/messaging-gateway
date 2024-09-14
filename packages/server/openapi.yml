@@ -92,15 +92,33 @@ paths:
         LINEのWebhookからのPOSTリクエストを受信する。
         POSTリクエストの仕様詳細はLINEのドキュメントを参照。
         - [Messaging API | Webhook](https://developers.line.biz/ja/reference/messaging-api/#webhooks)
+      parameters:
+        - in: header
+          name: x-line-signature
+          description: |
+            署名の検証に使う署名
+            - [Messaging API | 署名を検証する](https://developers.line.biz/ja/reference/messaging-api/#signature-validation)
+          required: true
+          schema:
+            type: string
       requestBody:
-        description: |
-          LINEのWebhookイベントオブジェクト
-          - [Messaging API | Webhookイベントオブジェクト](https://developers.line.biz/ja/reference/messaging-api/#webhook-event-objects)
         required: true
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/WebhookEventObject"
+              type: object
+              properties:
+                destination:
+                  description: Webhookイベントを受信すべきボットのユーザーID。
+                  type: string
+                events:
+                  description: Webhookイベントオブジェクトの配列。
+                  type: array
+                  items:
+                    $ref: "#/components/schemas/WebhookEventObject"
+              required:
+                - destination
+                - events
       responses:
         "200":
           description: |
@@ -136,8 +154,26 @@ components:
         - id
     WebhookEventObject:
       description: |
-        LINEのWebhookイベントオブジェクト
+        LINEのWebhookイベントオブジェクト。
         - [Messaging API | Webhookイベントオブジェクト](https://developers.line.biz/ja/reference/messaging-api/#webhook-event-objects)
+    WebhookStreamObject:
+      description: |
+        LINEのWebhookイベントをStreamに流すとき用のオブジェクト。
+      type: object
+      properties:
+        requestId:
+          description: Webhook受信時にmessaging-gatewayで発行したリクエストID。
+          type: string
+        destination:
+          description: Webhookイベントを受信すべきボットのユーザーID。
+          type: string
+        events:
+          description: 受信したWebhookイベントオブジェクト。
+          $ref: "#/components/schemas/WebhookEventObject"
+      required:
+        - requestId
+        - destination
+        - events
     ErrorObject:
       description: エラー情報。
       type: object

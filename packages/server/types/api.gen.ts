@@ -113,16 +113,23 @@ export interface paths {
         post: {
             parameters: {
                 query?: never;
-                header?: never;
+                header: {
+                    /** @description 署名の検証に使う署名
+                     *     - [Messaging API | 署名を検証する](https://developers.line.biz/ja/reference/messaging-api/#signature-validation)
+                     *      */
+                    "x-line-signature": string;
+                };
                 path?: never;
                 cookie?: never;
             };
-            /** @description LINEのWebhookイベントオブジェクト
-             *     - [Messaging API | Webhookイベントオブジェクト](https://developers.line.biz/ja/reference/messaging-api/#webhook-event-objects)
-             *      */
             requestBody: {
                 content: {
-                    "application/json": components["schemas"]["WebhookEventObject"];
+                    "application/json": {
+                        /** @description Webhookイベントを受信すべきボットのユーザーID。 */
+                        destination: string;
+                        /** @description Webhookイベントオブジェクトの配列。 */
+                        events: components["schemas"]["WebhookEventObject"][];
+                    };
                 };
             };
             responses: {
@@ -169,10 +176,20 @@ export interface components {
             /** @description メッセージの引用トークン。 */
             quoteToken?: string;
         };
-        /** @description LINEのWebhookイベントオブジェクト
+        /** @description LINEのWebhookイベントオブジェクト。
          *     - [Messaging API | Webhookイベントオブジェクト](https://developers.line.biz/ja/reference/messaging-api/#webhook-event-objects)
          *      */
         WebhookEventObject: unknown;
+        /** @description LINEのWebhookイベントをStreamに流すとき用のオブジェクト。
+         *      */
+        WebhookStreamObject: {
+            /** @description Webhook受信時にmessaging-gatewayで発行したリクエストID。 */
+            requestId: string;
+            /** @description Webhookイベントを受信すべきボットのユーザーID。 */
+            destination: string;
+            /** @description 受信したWebhookイベントオブジェクト。 */
+            events: components["schemas"]["WebhookEventObject"];
+        };
         /** @description エラー情報。 */
         ErrorObject: {
             message: string;
