@@ -40,7 +40,7 @@ export async function POST(req: NextRequest) {
     }
   } catch (err) {
     const msg = "internal server error";
-    logger.error(msg, { err });
+    logger.error(msg, { message: err });
     const errObj: ErrorObject = { message: msg };
     return NextResponse.json(errObj, { status: 500 });
   }
@@ -87,10 +87,10 @@ async function sendMessage(
         const body = JSON.parse(err.body);
         msg += `, ${body.error}(${body.error_description})`;
       } catch (err) {
-        logger.warn("failed to parse response", { err });
+        logger.warn("failed to parse response", { message: err });
       }
     }
-    logger.error(msg, { err });
+    logger.error(msg, { message: err });
     return msg;
   }
   logger.debug("issued channel access token");
@@ -110,10 +110,10 @@ async function sendMessage(
         }
       }
     } catch (err) {
-      logger.warn("failed to parse response", { err });
+      logger.warn("failed to parse response", { message: err });
     }
 
-    logger.error(msg, { err });
+    logger.error(msg, { message: err });
     return msg;
   }
 }

@@ -162,16 +162,20 @@ components:
       type: object
       properties:
         requestId:
-          description: Webhook受信時にmessaging-gatewayで発行したリクエストID。
+          description: WebhookのPOSTリクエスト受信時にmessaging-gatewayで発行したリクエストID。
+          type: string
+        signature:
+          description: WebhookのPOSTリクエストで受信した署名。
           type: string
         destination:
           description: Webhookイベントを受信すべきボットのユーザーID。
           type: string
         events:
-          description: 受信したWebhookイベントオブジェクト。
-          $ref: "#/components/schemas/WebhookEventObject"
+          description: 受信したWebhookイベントオブジェクトのJSON文字列。
+          type: string
       required:
         - requestId
+        - signature
         - destination
         - events
     ErrorObject:

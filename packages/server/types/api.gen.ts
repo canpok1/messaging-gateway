@@ -183,12 +183,14 @@ export interface components {
         /** @description LINEのWebhookイベントをStreamに流すとき用のオブジェクト。
          *      */
         WebhookStreamObject: {
-            /** @description Webhook受信時にmessaging-gatewayで発行したリクエストID。 */
+            /** @description WebhookのPOSTリクエスト受信時にmessaging-gatewayで発行したリクエストID。 */
             requestId: string;
+            /** @description WebhookのPOSTリクエストで受信した署名。 */
+            signature: string;
             /** @description Webhookイベントを受信すべきボットのユーザーID。 */
             destination: string;
-            /** @description 受信したWebhookイベントオブジェクト。 */
-            events: components["schemas"]["WebhookEventObject"];
+            /** @description 受信したWebhookイベントオブジェクトのJSON文字列。 */
+            events: string;
         };
         /** @description エラー情報。 */
         ErrorObject: {

@@ -1,24 +1,55 @@
 import { NextRequest, NextResponse } from "next/server";
-import { messagingApi } from "@line/bot-sdk";
+import { webhook } from "@line/bot-sdk";
 import { Env } from "@/utils/Env";
 import { createLogger } from "@/utils/Logger";
 import { v4 as uuidv4 } from "uuid";
 
-import type { ErrorObject } from "@/types/api";
+import type { ErrorObject, WebhookStreamObject } from "@/types/api";
+import { RedisClient } from "@/utils/Redis";
+
+const HEADER_SIGNATURE = "x-line-signature";
 
 export async function POST(req: NextRequest) {
   const requestId = uuidv4();
   const env = new Env(process.env);
   const logger = createLogger(env, { requestId });
   try {
-    const body = (await req.json()) as messagingApi.PushMessageRequest;
+    let signature: string = undefined;
+    for (const pair of req.headers.entries()) {
+      if (pair[0].toLocaleString() === HEADER_SIGNATURE) {
+        signature = pair[1];
+      }
+    }
+    if (!signature) {
+      const errObj: ErrorObject = {
+        message: `not found required header[${HEADER_SIGNATURE}]`,
+      };
+      return NextResponse.json(errObj, { status: 400 });
+    }
 
-    logger.info("received request", { body });
+    const body = (await req.json()) as webhook.CallbackRequest;
+    logger.info("received request", { signature, body });
+
+    const client = new RedisClient(env.redisStreamName, {
+      host: env.redisHost,
+      port: env.redisPort,
+    });
+
+    const streamObj: WebhookStreamObject = {
+      requestId,
+      signature,
+      destination: body.destination,
+      events: JSON.stringify(body.events),
+    };
+    logger.info("make webhook stream object", { streamObj });
+
+    const id = await client.addWebhookStreamObject(streamObj);
+    logger.info("added webhookStreamObject", { id });
 
     return NextResponse.json({}, { status: 200 });
   } catch (err) {
     const msg = "internal server error";
-    logger.error(msg, { err });
+    logger.error(msg, { message: err });
     const errObj: ErrorObject = { message: msg };
     return NextResponse.json(errObj, { status: 500 });
   }
