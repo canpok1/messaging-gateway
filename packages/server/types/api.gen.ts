@@ -97,6 +97,63 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/line/webhook/": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** @description LINEのWebhookからのPOSTリクエストを受信する。
+         *     POSTリクエストの仕様詳細はLINEのドキュメントを参照。
+         *     - [Messaging API | Webhook](https://developers.line.biz/ja/reference/messaging-api/#webhooks)
+         *      */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            /** @description LINEのWebhookイベントオブジェクト
+             *     - [Messaging API | Webhookイベントオブジェクト](https://developers.line.biz/ja/reference/messaging-api/#webhook-event-objects)
+             *      */
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["WebhookEventObject"];
+                };
+            };
+            responses: {
+                /** @description POSTリクエストの受信成功。
+                 *      */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": Record<string, never>;
+                    };
+                };
+                /** @description 内部エラー
+                 *      */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorObject"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
 }
 export type webhooks = Record<string, never>;
 export interface components {
@@ -112,6 +169,10 @@ export interface components {
             /** @description メッセージの引用トークン。 */
             quoteToken?: string;
         };
+        /** @description LINEのWebhookイベントオブジェクト
+         *     - [Messaging API | Webhookイベントオブジェクト](https://developers.line.biz/ja/reference/messaging-api/#webhook-event-objects)
+         *      */
+        WebhookEventObject: unknown;
         /** @description エラー情報。 */
         ErrorObject: {
             message: string;

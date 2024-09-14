@@ -86,6 +86,36 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/ErrorObject"
+  /api/line/webhook/:
+    post:
+      description: |
+        LINEのWebhookからのPOSTリクエストを受信する。
+        POSTリクエストの仕様詳細はLINEのドキュメントを参照。
+        - [Messaging API | Webhook](https://developers.line.biz/ja/reference/messaging-api/#webhooks)
+      requestBody:
+        description: |
+          LINEのWebhookイベントオブジェクト
+          - [Messaging API | Webhookイベントオブジェクト](https://developers.line.biz/ja/reference/messaging-api/#webhook-event-objects)
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/WebhookEventObject"
+      responses:
+        "200":
+          description: |
+            POSTリクエストの受信成功。
+          content:
+            application/json:
+              schema:
+                type: object
+        "500":
+          description: |
+            内部エラー
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorObject"
 components:
   schemas:
     MessageObject:
@@ -104,6 +134,10 @@ components:
           type: string
       required:
         - id
+    WebhookEventObject:
+      description: |
+        LINEのWebhookイベントオブジェクト
+        - [Messaging API | Webhookイベントオブジェクト](https://developers.line.biz/ja/reference/messaging-api/#webhook-event-objects)
     ErrorObject:
       description: エラー情報。
       type: object
