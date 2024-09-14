@@ -41,7 +41,7 @@ export async function POST(req: NextRequest) {
       destination: body.destination,
       events: JSON.stringify(body.events),
     };
-    logger.info("make webhook stream object", { streamObj });
+    logger.debug("make webhook stream object", { streamObj });
 
     const id = await client.addWebhookStreamObject(streamObj);
     logger.info("added webhookStreamObject", { id });
