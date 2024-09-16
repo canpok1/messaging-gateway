@@ -1,3 +1,5 @@
+export const dynamic = "force-dynamic";
+
 import { NextRequest, NextResponse } from "next/server";
 import { webhook } from "@line/bot-sdk";
 import { Env } from "@/utils/Env";
@@ -5,8 +7,7 @@ import { createLogger } from "@/utils/Logger";
 import { v4 as uuidv4 } from "uuid";
 
 import type { ErrorObject } from "@/types/api";
-import { RedisClient } from "@/utils/Redis";
-import { WebhookStreamObject } from "@messaging-gateway/lib";
+import { RedisClient, WebhookStreamObject } from "@/utils/Redis";
 
 const HEADER_SIGNATURE = "x-line-signature";
 
@@ -34,7 +35,8 @@ export async function POST(req: NextRequest) {
     const client = new RedisClient(
       env.redisHost,
       env.redisPort,
-      env.redisStreamName
+      env.redisStreamName,
+      env.redisGroupName
     );
     logger.debug("make redis client", {
       redisHost: env.redisHost,
@@ -46,7 +48,7 @@ export async function POST(req: NextRequest) {
       requestId,
       signature,
       destination: body.destination,
-      events: JSON.stringify(body.events),
+      events: body.events,
     };
     logger.debug("make webhook stream object", { streamObj });
 
