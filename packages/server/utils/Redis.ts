@@ -133,8 +133,7 @@ export class RedisClient {
         const message = await this.xclaim(
           consumerName,
           maxIdleTimeMs,
-          pendingMessage.messageId,
-          pendingMessage.deliveryCount + 1
+          pendingMessage.messageId
         );
         messages.push(message);
         if (messages.length >= maxCount) {
@@ -173,17 +172,14 @@ export class RedisClient {
   private async xclaim(
     consumerName: string,
     maxIdleTimeMs: number,
-    messageId: string,
-    deliveryCount: number
+    messageId: string
   ): Promise<WebhookMessageObject> {
     const result = await this.client.xclaim(
       this.streamName,
       this.groupName,
       consumerName,
       maxIdleTimeMs,
-      messageId,
-      "RETRYCOUNT",
-      deliveryCount + 1
+      messageId
     );
     const fields = result[0][1] as string[];
     const value = this.findValue(fields, "message");
