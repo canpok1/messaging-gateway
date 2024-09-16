@@ -1,3 +1,5 @@
+export const dynamic = "force-dynamic";
+
 import { NextRequest, NextResponse } from "next/server";
 import { webhook } from "@line/bot-sdk";
 import { Env } from "@/utils/Env";

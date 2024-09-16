@@ -1,3 +1,5 @@
+export const dynamic = "force-dynamic";
+
 import { NextRequest, NextResponse } from "next/server";
 import { Env } from "@/utils/Env";
 import { createLogger } from "@/utils/Logger";
