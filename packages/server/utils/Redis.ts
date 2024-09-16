@@ -130,12 +130,19 @@ export class RedisClient {
           continue;
         }
 
-        const message = await this.xclaim(
-          consumerName,
-          maxIdleTimeMs,
-          pendingMessage.messageId
-        );
-        messages.push(message);
+        try {
+          const message = await this.xclaim(
+            consumerName,
+            maxIdleTimeMs,
+            pendingMessage.messageId
+          );
+          messages.push(message);
+        } catch (err) {
+          logger.warn("skip xclaim for redis pending message", {
+            messageId: pendingMessage.messageId,
+            message: err,
+          });
+        }
         if (messages.length >= maxCount) {
           shouldContinue = false;
           break;
