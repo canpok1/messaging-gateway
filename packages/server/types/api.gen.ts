@@ -13,11 +13,14 @@ export interface paths {
         };
         get?: never;
         put?: never;
-        /** @description LINEにプッシュメッセージを送信する。
+        /**
+         * LINEにプッシュメッセージを送信
+         * @description LINEにプッシュメッセージを送信する。
          *     LINEのMessaging APIを利用しているため詳細はLINEのドキュメントを参照。
          *     - [Messaging API | チャンネルアクセストークンv2.1を発行する](https://developers.line.biz/ja/reference/messaging-api/#issue-channel-access-token-v2-1)
          *     - [Messaging API | プッシュメッセージを送る](https://developers.line.biz/ja/reference/messaging-api/#send-push-message)
-         *      */
+         *
+         */
         post: {
             parameters: {
                 query?: never;
@@ -89,6 +92,15 @@ export interface paths {
                         "application/json": components["schemas"]["ErrorObject"];
                     };
                 };
+                /** @description 内部エラー */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorObject"];
+                    };
+                };
             };
         };
         delete?: never;
@@ -97,7 +109,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/line/webhook/": {
+    "/api/line/webhook/messages/{messageId}": {
         parameters: {
             query?: never;
             header?: never;
@@ -106,10 +118,156 @@ export interface paths {
         };
         get?: never;
         put?: never;
-        /** @description LINEのWebhookからのPOSTリクエストを受信する。
+        post?: never;
+        /**
+         * Webhookメッセージを削除
+         * @description Webhookメッセージを削除する。
+         */
+        delete: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    /** @description メッセージID */
+                    messageId: string;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description 削除成功 */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": Record<string, never>;
+                    };
+                };
+                /** @description 指定されたWebhookメッセージが見つからない */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorObject"];
+                    };
+                };
+                /** @description 内部エラー */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorObject"];
+                    };
+                };
+            };
+        };
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/line/webhook/messages/new": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * 新たに処理すべきWebhookメッセージを取得
+         * @description Webhookメッセージのうち指定コンシューマで新たに処理すべきものを取得する。
+         *     取得対象メッセージは以下のもので、最大件数になるまで上から順に取得する。
+         *     - 他コンシューマに配信済みメッセージのうちアイドル時間が最大アイドル時間を超えたもの
+         *     - 未配信メッセージ
+         *
+         *     |配信済み？|コンシューマ|アイドル時間|配信回数|取得対象？|備考|
+         *     |---|---|---|---|---|---|
+         *     |未|-|-|-|◯|処理するため取得する。配信数は1となる。|
+         *     |済|指定|最大以下|最大以下|✕|自身で処理中のため取得しない。|
+         *     |済|指定|最大以下|最大超過|✕|リトライしても回復の見込みが無いためエラー扱い。|
+         *     |済|指定|最大超過|最大以下|✕|他コンシューマに任せるため取得しない。|
+         *     |済|他|最大以下|最大以下|✕|他コンシューマに任せるため取得しない。|
+         *     |済|他|最大以下|最大超過|✕|リトライしても回復の見込みが無いためエラー扱い。|
+         *     |済|他|最大超過|最大以下|◯|リトライするため取得する。配信数は+1。|
+         *
+         */
+        get: {
+            parameters: {
+                query: {
+                    /** @description コンシューマ名。 */
+                    consumer: string;
+                    /** @description 取得件数の上限。省略時は上限なし扱い。 */
+                    max_count?: number;
+                    /** @description アイドル時間（ms）の上限。省略時は1分扱い。 */
+                    max_idle_time_ms?: number;
+                    /** @description 配信回数の上限。省略時は3回扱い。 */
+                    max_delivery_count?: number;
+                };
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description 取得成功 */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            /** @description Webhookメッセージのリスト。 */
+                            messages?: components["schemas"]["WebhookMessageObject"][];
+                        };
+                    };
+                };
+                /** @description 必須パラメータの不足 */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorObject"];
+                    };
+                };
+                /** @description 内部エラー */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorObject"];
+                    };
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/line/webhook/events": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Webhookメッセージを追加（LINE Webhookの受け口）
+         * @description LINEのWebhookからのPOSTリクエストを受信し、未読のWebhookメッセージとして保持する。
          *     POSTリクエストの仕様詳細はLINEのドキュメントを参照。
          *     - [Messaging API | Webhook](https://developers.line.biz/ja/reference/messaging-api/#webhooks)
-         *      */
+         *
+         */
         post: {
             parameters: {
                 query?: never;
@@ -180,9 +338,14 @@ export interface components {
          *     - [Messaging API | Webhookイベントオブジェクト](https://developers.line.biz/ja/reference/messaging-api/#webhook-event-objects)
          *      */
         WebhookEventObject: unknown;
-        /** @description LINEのWebhookイベントをStreamに流すとき用のオブジェクト。
-         *      */
-        WebhookStreamObject: {
+        /** @description LINEのWebhookで受信したメッセージ。 */
+        WebhookMessageObject: {
+            /** @description メッセージID。 */
+            messageId?: string;
+            /** @description アイドル時間（ms）。配信されてからの経過時間のこと。 */
+            idleTimeMs?: number;
+            /** @description 配信回数。 */
+            deliveryCount?: number;
             /** @description WebhookのPOSTリクエスト受信時にmessaging-gatewayで発行したリクエストID。 */
             requestId: string;
             /** @description WebhookのPOSTリクエストで受信した署名。 */
