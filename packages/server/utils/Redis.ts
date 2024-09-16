@@ -1,33 +1,16 @@
-import { type WebhookStreamObject } from "@/types/api";
-import { SecretString } from "@messaging-gateway/lib";
+import { type WebhookStreamObject } from "@messaging-gateway/lib";
 import { createClient, type RedisClientType } from "redis";
 
 export type Id = string;
-
-export interface ConnectionSetting {
-  username?: string;
-  password?: SecretString;
-  host: string;
-  port: number;
-}
 
 export class RedisClient {
   private streamName: string;
   private client: RedisClientType;
 
-  constructor(streamName: string, setting: ConnectionSetting) {
-    const urlParams = ["redis://"];
-    if (setting.username) {
-      urlParams.push(setting.username);
-      if (setting.password) {
-        urlParams.push(setting.username);
-      }
-      urlParams.push("@");
-    }
-    urlParams.push(setting.host);
-    urlParams.push(":" + setting.port);
-
-    this.client = createClient({ url: urlParams.join("") });
+  constructor(host: string, port: number, streamName: string) {
+    const url = `redis://${host}:${port}`;
+    console.log(`url: ${url}`);
+    this.client = createClient({ url: url });
     this.streamName = streamName;
   }
 

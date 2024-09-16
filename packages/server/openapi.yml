@@ -5,9 +5,17 @@ info:
 servers:
   - url: http://localhost:3000
     description: local server
+tags:
+  - name: LINE Messaging API
+    description: Messaging API の操作
+  - name: LINE Webhook
+    description: LINE Webhook 関連の操作
 paths:
   /api/line/v2/bot/message/push:
     post:
+      summary: LINEにプッシュメッセージを送信
+      tags:
+        - LINE Messaging API
       description: |
         LINEにプッシュメッセージを送信する。
         LINEのMessaging APIを利用しているため詳細はLINEのドキュメントを参照。
@@ -86,10 +94,123 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/ErrorObject"
-  /api/line/webhook/:
-    post:
+        "500":
+          description: 内部エラー
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorObject"
+  /api/line/webhook/messages/{messageId}:
+    delete:
+      summary: Webhookメッセージを削除
+      tags:
+        - LINE Webhook
+      description: Webhookメッセージを削除する。
+      parameters:
+        - in: path
+          name: messageId
+          description: メッセージID
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: 削除成功
+          content:
+            application/json:
+              schema:
+                type: object
+        "404":
+          description: 指定されたWebhookメッセージが見つからない
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorObject"
+        "500":
+          description: 内部エラー
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorObject"
+
+  /api/line/webhook/messages/new:
+    get:
+      summary: 新たに処理すべきWebhookメッセージを取得
+      tags:
+        - LINE Webhook
       description: |
-        LINEのWebhookからのPOSTリクエストを受信する。
+        Webhookメッセージのうち指定コンシューマで新たに処理すべきものを取得する。
+        取得対象メッセージは以下のもので、最大件数になるまで上から順に取得する。
+        - 他コンシューマに配信済みメッセージのうちアイドル時間が最大アイドル時間を超えたもの
+        - 未配信メッセージ
+
+        |配信済み？|コンシューマ|アイドル時間|配信回数|取得対象？|備考|
+        |---|---|---|---|---|---|
+        |未|-|-|-|◯|処理するため取得する。配信数は1となる。|
+        |済|指定|最大以下|最大以下|✕|自身で処理中のため取得しない。|
+        |済|指定|最大以下|最大超過|✕|リトライしても回復の見込みが無いためエラー扱い。|
+        |済|指定|最大超過|最大以下|✕|他コンシューマに任せるため取得しない。|
+        |済|他|最大以下|最大以下|✕|他コンシューマに任せるため取得しない。|
+        |済|他|最大以下|最大超過|✕|リトライしても回復の見込みが無いためエラー扱い。|
+        |済|他|最大超過|最大以下|◯|リトライするため取得する。配信数は+1。|
+      parameters:
+        - in: query
+          name: consumer
+          description: コンシューマ名。
+          required: true
+          schema:
+            type: string
+        - in: query
+          name: max_count
+          description: 取得件数の上限。省略時は上限なし扱い。
+          required: false
+          schema:
+            type: number
+        - in: query
+          name: max_idle_time_ms
+          description: アイドル時間（ms）の上限。省略時は1分扱い。
+          required: false
+          schema:
+            type: number
+        - in: query
+          name: max_delivery_count
+          description: 配信回数の上限。省略時は3回扱い。
+          required: false
+          schema:
+            type: number
+      responses:
+        "200":
+          description: 取得成功
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  messages:
+                    description: Webhookメッセージのリスト。
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/WebhookMessageObject"
+        "400":
+          description: 必須パラメータの不足
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorObject"
+        "500":
+          description: 内部エラー
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorObject"
+
+  /api/line/webhook/events:
+    post:
+      summary: Webhookメッセージを追加（LINE Webhookの受け口）
+      tags:
+        - LINE Webhook
+      description: |
+        LINEのWebhookからのPOSTリクエストを受信し、未読のWebhookメッセージとして保持する。
         POSTリクエストの仕様詳細はLINEのドキュメントを参照。
         - [Messaging API | Webhook](https://developers.line.biz/ja/reference/messaging-api/#webhooks)
       parameters:
@@ -156,11 +277,19 @@ components:
       description: |
         LINEのWebhookイベントオブジェクト。
         - [Messaging API | Webhookイベントオブジェクト](https://developers.line.biz/ja/reference/messaging-api/#webhook-event-objects)
-    WebhookStreamObject:
-      description: |
-        LINEのWebhookイベントをStreamに流すとき用のオブジェクト。
+    WebhookMessageObject:
+      description: LINEのWebhookで受信したメッセージ。
       type: object
       properties:
+        messageId:
+          description: メッセージID。
+          type: string
+        idleTimeMs:
+          description: アイドル時間（ms）。配信されてからの経過時間のこと。
+          type: number
+        deliveryCount:
+          description: 配信回数。
+          type: number
         requestId:
           description: WebhookのPOSTリクエスト受信時にmessaging-gatewayで発行したリクエストID。
           type: string
@@ -178,6 +307,7 @@ components:
         - signature
         - destination
         - events
+
     ErrorObject:
       description: エラー情報。
       type: object
