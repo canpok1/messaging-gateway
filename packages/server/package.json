@@ -3,26 +3,21 @@
   "version": "1.0.0",
   "private": true,
   "scripts": {
-    "dev": "dotenv -e ../../.devcontainer/db.env -e .env next dev",
-    "build": "next build",
-    "start": "dotenv -e ../../.devcontainer/db.env -e .env next start",
-    "lint": "next lint",
-    "typecheck": "tsc --noEmit",
-    "generate:api": "npx openapi-typescript ./openapi.yml -o ./types/api.gen.ts"
+    "dev": "dotenv -e ../../.devcontainer/db.env -e .env vite",
+    "build": "vite build",
+    "start": "NODE_ENV=production dotenv -e ../../.devcontainer/.db.env -e .env node ./dist/index.mjs",
+    "generate:api": "npx openapi-typescript ./openapi.yml -o ./src/types/api.gen.ts"
   },
   "dependencies": {
     "@messaging-gateway/lib": "file:../lib",
-    "ioredis": "^5.4.1",
-    "next": "^14.2.13",
-    "react": "^18.3.1",
-    "react-dom": "^18.3.1",
+    "express": "^4.21.0",
     "uuid": "^10.0.0"
   },
   "devDependencies": {
-    "@types/react": "18.3.8",
+    "@types/express": "^4.17.21",
     "@types/uuid": "^10.0.0",
-    "eslint": "^8",
-    "eslint-config-next": "14.2.13",
-    "typescript": "5.6.2"
+    "typescript": "5.6.2",
+    "vite": "^4.5.5",
+    "vite-plugin-node": "^3.1.0"
   }
 }

@@ -1,35 +1,34 @@
 export const dynamic = "force-dynamic";
 
-import { NextRequest, NextResponse } from "next/server";
 import { webhook } from "@line/bot-sdk";
-import { Env } from "@/utils/Env";
-import { createLogger } from "@/utils/Logger";
 import { v4 as uuidv4 } from "uuid";
 
 import type { ErrorObject } from "@/types/api";
-import { RedisClient, WebhookStreamObject } from "@/utils/Redis";
+import { RedisClient, WebhookStreamObject } from "@/Redis";
+import { Env } from "@/Env";
+import { createLogger } from "@/Logger";
+import express from "express";
 
 const HEADER_SIGNATURE = "x-line-signature";
 
-export async function POST(req: NextRequest) {
+export async function POST(
+  env: Env,
+  req: express.Request,
+  res: express.Response
+) {
   const requestId = uuidv4();
-  const env = new Env(process.env);
   const logger = createLogger(env, { requestId });
   try {
-    let signature: string = undefined;
-    for (const pair of req.headers.entries()) {
-      if (pair[0].toLocaleString() === HEADER_SIGNATURE) {
-        signature = pair[1];
-      }
-    }
+    const signature: string = req.get(HEADER_SIGNATURE);
     if (!signature) {
       const errObj: ErrorObject = {
         message: `not found required header[${HEADER_SIGNATURE}]`,
       };
-      return NextResponse.json(errObj, { status: 400 });
+      res.status(400).json(errObj);
+      return;
     }
 
-    const body = (await req.json()) as webhook.CallbackRequest;
+    const body = req.body as webhook.CallbackRequest;
     logger.info("received request", { signature, body });
 
     const client = new RedisClient(
@@ -55,11 +54,13 @@ export async function POST(req: NextRequest) {
     const id = await client.addWebhookStreamObject(streamObj);
     logger.info("added webhookStreamObject", { id });
 
-    return NextResponse.json({}, { status: 200 });
+    res.status(200).json({});
+    return;
   } catch (err) {
     const msg = "internal server error";
     logger.error(msg, { message: err });
     const errObj: ErrorObject = { message: msg };
-    return NextResponse.json(errObj, { status: 500 });
+    res.status(500).json(errObj);
+    return;
   }
 }
