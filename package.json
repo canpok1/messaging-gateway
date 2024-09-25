@@ -33,7 +33,7 @@
     "@vitest/coverage-v8": "^2.1.1",
     "dotenv-cli": "^7.4.2",
     "openapi-typescript": "^7.4.1",
-    "prisma": "^5.19.1",
+    "prisma": "^5.20.0",
     "vitest": "^2.0.5"
   },
   "dependencies": {
