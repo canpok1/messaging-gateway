@@ -1,10 +1,11 @@
+import { resolve } from "path";
 import { defineConfig } from "vite";
 import { VitePluginNode } from "vite-plugin-node";
 
 export default defineConfig({
   resolve: {
     alias: {
-      "@": "src",
+      "@": resolve(__dirname, "./src"),
     },
   },
   server: {
@@ -17,4 +18,13 @@ export default defineConfig({
       appPath: "./src/Index.ts",
     }),
   ],
+  build: {
+    sourcemap: true,
+    rollupOptions: {
+      input: {
+        main: "./src/Index.ts",
+      },
+      external: [],
+    },
+  },
 });

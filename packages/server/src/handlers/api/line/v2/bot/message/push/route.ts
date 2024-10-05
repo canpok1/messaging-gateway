@@ -11,8 +11,6 @@ import { createLogger, Logger } from "@/Logger";
 import { ErrorObject } from "@/types/api";
 import express from "express";
 
-const HEADER_SIGNATURE = "x-line-signature";
-
 export async function POST(
   env: Env,
   req: express.Request,

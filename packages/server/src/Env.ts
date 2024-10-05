@@ -1,5 +1,5 @@
 import { SecretString } from "@messaging-gateway/lib";
-import { isLogLevelString, LogLevelString } from "./Logger";
+import { isLogLevelString, LogLevelString } from "@/Logger";
 
 export class Env {
   readonly appName: string;

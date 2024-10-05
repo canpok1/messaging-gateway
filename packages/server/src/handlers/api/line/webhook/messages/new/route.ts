@@ -1,9 +1,6 @@
-export const dynamic = "force-dynamic";
-
 import { Env } from "@/Env";
 import { createLogger } from "@/Logger";
 import { v4 as uuidv4 } from "uuid";
-
 import type { ErrorObject, WebhookMessageObject } from "@/types/api";
 import { RequestParam, RequestParamError } from "@/Request";
 import { RedisClient } from "@/Redis";

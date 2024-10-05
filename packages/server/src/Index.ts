@@ -1,8 +1,8 @@
 import express from "express";
-import { Env } from "./Env";
-import { POST as postMessage } from "./handlers/api/line/v2/bot/message/push/route";
-import { POST as postEvent } from "./handlers/api/line/webhook/events/route";
-import { GET as getNewMessage } from "./handlers/api/line/webhook/messages/new/route";
+import { Env } from "@/Env";
+import { POST as postMessage } from "@/handlers/api/line/v2/bot/message/push/route";
+import { POST as postEvent } from "@/handlers/api/line/webhook/events/route";
+import { GET as getNewMessage } from "@/handlers/api/line/webhook/messages/new/route";
 
 const env = new Env(process.env);
 const app = express();

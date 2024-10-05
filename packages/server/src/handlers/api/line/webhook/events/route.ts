@@ -1,13 +1,10 @@
-export const dynamic = "force-dynamic";
-
 import { webhook } from "@line/bot-sdk";
 import { v4 as uuidv4 } from "uuid";
-
 import type { ErrorObject } from "@/types/api";
 import { RedisClient, WebhookStreamObject } from "@/Redis";
+import express from "express";
 import { Env } from "@/Env";
 import { createLogger } from "@/Logger";
-import express from "express";
 
 const HEADER_SIGNATURE = "x-line-signature";
 

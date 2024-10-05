@@ -5,7 +5,7 @@
   "scripts": {
     "dev": "dotenv -e ../../.devcontainer/db.env -e .env vite",
     "build": "vite build",
-    "start": "NODE_ENV=production dotenv -e ../../.devcontainer/.db.env -e .env node ./dist/index.mjs",
+    "start": "NODE_ENV=production dotenv -e ../../.devcontainer/.db.env -e .env node ./dist/Index.mjs",
     "generate:api": "npx openapi-typescript ./openapi.yml -o ./src/types/api.gen.ts"
   },
   "dependencies": {

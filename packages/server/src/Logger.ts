@@ -1,5 +1,5 @@
 import winston from "winston";
-import { Env } from "./Env";
+import { Env } from "@/Env";
 
 const logLevelStrings = [
   "error",
