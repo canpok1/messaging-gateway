@@ -16,42 +16,29 @@ export async function GET(env: Env, req: Request, res: Response) {
   const logger = createLogger(env, { requestId });
 
   const params = new RequestParam(req);
-  try {
-    const consumer = params.getRequiredStringValue("consumer");
-    const maxCount = params.getNumberValue("max_count");
-    const maxIdleTimeMs = params.getNumberValue("max_idle_time_ms") || 60000;
-    const maxDeliveryCount = params.getNumberValue("max_delivery_count") || 3;
-    logger.info("received request", {
-      consumer,
-      maxCount,
-      maxIdleTimeMs,
-      maxDeliveryCount,
-    });
 
-    const messages = await readMessages(
-      env,
-      logger,
-      consumer,
-      maxCount,
-      maxIdleTimeMs,
-      maxDeliveryCount
-    );
+  const consumer = params.getRequiredStringValue("consumer");
+  const maxCount = params.getNumberValue("max_count");
+  const maxIdleTimeMs = params.getNumberValue("max_idle_time_ms") || 60000;
+  const maxDeliveryCount = params.getNumberValue("max_delivery_count") || 3;
+  logger.info("received request", {
+    consumer,
+    maxCount,
+    maxIdleTimeMs,
+    maxDeliveryCount,
+  });
 
-    const resObj: GetResponse = { messages };
-    res.status(200).json(resObj);
-    return;
-  } catch (err) {
-    if (err instanceof RequestParamError) {
-      const errObj: ErrorObject = { message: err.message };
-      res.status(400).json(errObj);
-      return;
-    }
+  const messages = await readMessages(
+    env,
+    logger,
+    consumer,
+    maxCount,
+    maxIdleTimeMs,
+    maxDeliveryCount
+  );
 
-    logger.error(err);
-    const errObj: ErrorObject = { message: "internal server error" };
-    res.status(500).json(errObj);
-    return;
-  }
+  const resObj: GetResponse = { messages };
+  res.status(200).json(resObj);
 }
 
 async function readMessages(

@@ -18,37 +18,28 @@ export async function POST(
 ) {
   const requestId = uuidv4();
   const logger = createLogger(env, { requestId });
-  try {
-    const channelId = req.get("X-MessagingGateway-Line-Channel-Id");
-    const body = req.body as messagingApi.PushMessageRequest;
 
-    logger.info("received request", { channelId, body });
+  const channelId = req.get("X-MessagingGateway-Line-Channel-Id");
+  const body = req.body as messagingApi.PushMessageRequest;
 
-    if (!channelId) {
-      const errObj: ErrorObject = {
-        message: "X-MessagingGateway-Line-Channel-Id is empty or not exists",
-      };
-      res.status(400).json(errObj);
-      return;
-    }
+  logger.info("received request", { channelId, body });
 
-    const childLogger = logger.child({ channelId });
-    const resObj = await sendMessage(env, channelId, body, childLogger);
-    if (typeof resObj === "string") {
-      const errObj: ErrorObject = { message: resObj };
-      res.status(400).json(errObj);
-      return;
-    } else {
-      childLogger.info("success to send message");
-      res.status(200).json(resObj);
-      return;
-    }
-  } catch (err) {
-    const msg = "internal server error";
-    logger.error(msg, { message: err });
-    const errObj: ErrorObject = { message: msg };
-    res.status(500).json(errObj);
+  if (!channelId) {
+    const errObj: ErrorObject = {
+      message: "X-MessagingGateway-Line-Channel-Id is empty or not exists",
+    };
+    res.status(400).json(errObj);
     return;
+  }
+
+  const childLogger = logger.child({ channelId });
+  const resObj = await sendMessage(env, channelId, body, childLogger);
+  if (typeof resObj === "string") {
+    const errObj: ErrorObject = { message: resObj };
+    res.status(400).json(errObj);
+  } else {
+    childLogger.info("success to send message");
+    res.status(200).json(resObj);
   }
 }
 
