@@ -1,27 +1,21 @@
-export const dynamic = "force-dynamic";
-
-import { NextRequest, NextResponse } from "next/server";
-import { Env } from "@/utils/Env";
-import { createLogger } from "@/utils/Logger";
+import { Env } from "@/Env";
+import { createLogger } from "@/Logger";
 import { v4 as uuidv4 } from "uuid";
-
 import type { ErrorObject, WebhookMessageObject } from "@/types/api";
-import { RequestParam, RequestParamError } from "@/utils/Request";
-import { RedisClient } from "@/utils/Redis";
+import { RequestParam, RequestParamError } from "@/Request";
+import { RedisClient } from "@/Redis";
 import { paths } from "@/types/api.gen";
 import { Logger } from "winston";
-
-const HEADER_SIGNATURE = "x-line-signature";
+import { Request, Response } from "express";
 
 type GetResponse =
   paths["/api/line/webhook/messages/new"]["get"]["responses"]["200"]["content"]["application/json"];
 
-export async function GET(req: NextRequest) {
+export async function GET(env: Env, req: Request, res: Response) {
   const requestId = uuidv4();
-  const env = new Env(process.env);
   const logger = createLogger(env, { requestId });
 
-  const params = new RequestParam(req.nextUrl.searchParams);
+  const params = new RequestParam(req);
   try {
     const consumer = params.getRequiredStringValue("consumer");
     const maxCount = params.getNumberValue("max_count");
@@ -43,17 +37,20 @@ export async function GET(req: NextRequest) {
       maxDeliveryCount
     );
 
-    const res: GetResponse = { messages };
-    return NextResponse.json(res, { status: 200 });
+    const resObj: GetResponse = { messages };
+    res.status(200).json(resObj);
+    return;
   } catch (err) {
     if (err instanceof RequestParamError) {
       const errObj: ErrorObject = { message: err.message };
-      return NextResponse.json(errObj, { status: 400 });
+      res.status(400).json(errObj);
+      return;
     }
 
     logger.error(err);
     const errObj: ErrorObject = { message: "internal server error" };
-    return NextResponse.json(errObj, { status: 500 });
+    res.status(500).json(errObj);
+    return;
   }
 }
 

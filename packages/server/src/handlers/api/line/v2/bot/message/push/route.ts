@@ -1,26 +1,26 @@
-export const dynamic = "force-dynamic";
-
 import {
   EncryptedValue,
   generateJwt,
   issueChannelAccessToken,
 } from "@messaging-gateway/lib";
 import { PrismaClient } from "@prisma/client";
-import { NextRequest, NextResponse } from "next/server";
 import { messagingApi, HTTPFetchError } from "@line/bot-sdk";
-import { Env } from "@/utils/Env";
-import { createLogger, Logger } from "@/utils/Logger";
 import { v4 as uuidv4 } from "uuid";
+import { Env } from "@/Env";
+import { createLogger, Logger } from "@/Logger";
+import { ErrorObject } from "@/types/api";
+import express from "express";
 
-import type { ErrorObject } from "@/types/api";
-
-export async function POST(req: NextRequest) {
+export async function POST(
+  env: Env,
+  req: express.Request,
+  res: express.Response
+) {
   const requestId = uuidv4();
-  const env = new Env(process.env);
   const logger = createLogger(env, { requestId });
   try {
-    const channelId = req.headers.get("X-MessagingGateway-Line-Channel-Id");
-    const body = (await req.json()) as messagingApi.PushMessageRequest;
+    const channelId = req.get("X-MessagingGateway-Line-Channel-Id");
+    const body = req.body as messagingApi.PushMessageRequest;
 
     logger.info("received request", { channelId, body });
 
@@ -28,23 +28,27 @@ export async function POST(req: NextRequest) {
       const errObj: ErrorObject = {
         message: "X-MessagingGateway-Line-Channel-Id is empty or not exists",
       };
-      return NextResponse.json(errObj, { status: 400 });
+      res.status(400).json(errObj);
+      return;
     }
 
     const childLogger = logger.child({ channelId });
-    const res = await sendMessage(env, channelId, body, childLogger);
-    if (typeof res === "string") {
-      const errObj: ErrorObject = { message: res };
-      return NextResponse.json(errObj, { status: 400 });
+    const resObj = await sendMessage(env, channelId, body, childLogger);
+    if (typeof resObj === "string") {
+      const errObj: ErrorObject = { message: resObj };
+      res.status(400).json(errObj);
+      return;
     } else {
       childLogger.info("success to send message");
-      return NextResponse.json(res, { status: 200 });
+      res.status(200).json(resObj);
+      return;
     }
   } catch (err) {
     const msg = "internal server error";
     logger.error(msg, { message: err });
     const errObj: ErrorObject = { message: msg };
-    return NextResponse.json(errObj, { status: 500 });
+    res.status(500).json(errObj);
+    return;
   }
 }
 

@@ -1,12 +1,18 @@
+import { Request } from "express";
 export class RequestParam {
-  private params: URLSearchParams;
+  private req: Request;
 
-  constructor(params: URLSearchParams) {
-    this.params = params;
+  constructor(req: Request) {
+    this.req = req;
   }
 
   getStringValue(key: string): string | undefined {
-    return this.params.has(key) ? this.params.get(key) : undefined;
+    const value = this.req.query[key];
+    if (typeof value === "string") {
+      return value;
+    } else {
+      return undefined;
+    }
   }
 
   getRequiredStringValue(key: string): string {
