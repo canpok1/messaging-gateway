@@ -31,13 +31,13 @@ export async function POST(
   const client = new RedisClient(
     env.redisHost,
     env.redisPort,
-    env.redisStreamName,
-    env.redisGroupName
+    env.redisStreamNameForLine,
+    env.redisGroupNameForLine
   );
   logger.debug("make redis client", {
     redisHost: env.redisHost,
     redisPort: env.redisPort,
-    redisStreamName: env.redisStreamName,
+    redisStreamName: env.redisStreamNameForLine,
   });
 
   const streamObj: WebhookStreamObject = {

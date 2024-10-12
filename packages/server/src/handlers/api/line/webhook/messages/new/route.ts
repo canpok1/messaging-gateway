@@ -1,8 +1,8 @@
 import { Env } from "@/Env";
 import { createLogger } from "@/Logger";
 import { v4 as uuidv4 } from "uuid";
-import type { ErrorObject, WebhookMessageObject } from "@/types/api";
-import { RequestParam, RequestParamError } from "@/Request";
+import type { WebhookMessageObject } from "@/types/api";
+import { RequestDataParser } from "@/Request";
 import { RedisClient } from "@/Redis";
 import { paths } from "@/types/api.gen";
 import { Logger } from "winston";
@@ -15,12 +15,14 @@ export async function GET(env: Env, req: Request, res: Response) {
   const requestId = uuidv4();
   const logger = createLogger(env, { requestId });
 
-  const params = new RequestParam(req);
+  const params = new RequestDataParser(req);
 
-  const consumer = params.getRequiredStringValue("consumer");
-  const maxCount = params.getNumberValue("max_count");
-  const maxIdleTimeMs = params.getNumberValue("max_idle_time_ms") || 60000;
-  const maxDeliveryCount = params.getNumberValue("max_delivery_count") || 3;
+  const consumer = params.getQueryParamAsString("consumer");
+  const maxCount = params.getQueryParamAsNumberOrUndefined("max_count");
+  const maxIdleTimeMs =
+    params.getQueryParamAsNumberOrUndefined("max_idle_time_ms") || 60000;
+  const maxDeliveryCount =
+    params.getQueryParamAsNumberOrUndefined("max_delivery_count") || 3;
   logger.info("received request", {
     consumer,
     maxCount,
@@ -52,23 +54,23 @@ async function readMessages(
   const client = new RedisClient(
     env.redisHost,
     env.redisPort,
-    env.redisStreamName,
-    env.redisGroupName
+    env.redisStreamNameForLine,
+    env.redisGroupNameForLine
   );
   logger.debug("make redis client", {
     redisHost: env.redisHost,
     redisPort: env.redisPort,
-    redisStreamName: env.redisStreamName,
-    redisGroupName: env.redisGroupName,
+    redisStreamName: env.redisStreamNameForLine,
+    redisGroupName: env.redisGroupNameForLine,
     consumer,
   });
 
   const created = await client.createConsumerGroupIfNotExists();
   if (created) {
-    logger.debug(`created consumer group ${env.redisGroupName}`);
+    logger.debug(`created consumer group ${env.redisGroupNameForLine}`);
   } else {
     logger.debug(
-      `skiped created consumer group ${env.redisGroupName}, group is exists`
+      `skiped created consumer group ${env.redisGroupNameForLine}, group is exists`
     );
   }
 

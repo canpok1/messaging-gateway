@@ -1,12 +1,12 @@
 import { Request } from "express";
-export class RequestParam {
+export class RequestDataParser {
   private req: Request;
 
   constructor(req: Request) {
     this.req = req;
   }
 
-  getStringValue(key: string): string | undefined {
+  getQueryParamAsStringOrUndefined(key: string): string | undefined {
     const value = this.req.query[key];
     if (typeof value === "string") {
       return value;
@@ -15,8 +15,8 @@ export class RequestParam {
     }
   }
 
-  getRequiredStringValue(key: string): string {
-    const value = this.getStringValue(key);
+  getQueryParamAsString(key: string): string {
+    const value = this.getQueryParamAsStringOrUndefined(key);
     if (!value) {
       throw new RequestParamError(`${key} is required but was not found`);
     }
@@ -24,8 +24,8 @@ export class RequestParam {
     return value;
   }
 
-  getNumberValue(key: string): number | undefined {
-    const value = this.getStringValue(key);
+  getQueryParamAsNumberOrUndefined(key: string): number | undefined {
+    const value = this.getQueryParamAsStringOrUndefined(key);
     if (value === undefined) {
       return undefined;
     }
