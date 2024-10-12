@@ -1,15 +1,17 @@
 import { SecretString } from "@messaging-gateway/lib";
 import { isLogLevelString, LogLevelString } from "@/Logger";
 
-export interface Env {
-  readonly appName: string;
-  readonly logLevel: LogLevelString;
-  readonly encryptionPassword: SecretString;
-  readonly redisHost: string;
-  readonly redisPort: number;
-  readonly redisStreamNameForLine: string;
-  readonly redisGroupNameForLine: string;
+export interface EnvParam {
+  appName: string;
+  logLevel: LogLevelString;
+  encryptionPassword: SecretString;
+  redisHost: string;
+  redisPort: number;
+  redisStreamNameForLine: string;
+  redisGroupNameForLine: string;
 }
+
+export type Env = Readonly<EnvParam>;
 
 export function createEnvFromProcessEnv(env: NodeJS.ProcessEnv): Env {
   return {
