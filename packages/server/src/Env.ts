@@ -7,8 +7,8 @@ export class Env {
   readonly encryptionPassword: SecretString;
   readonly redisHost: string;
   readonly redisPort: number;
-  readonly redisStreamName: string;
-  readonly redisGroupName: string;
+  readonly redisStreamNameForLine: string;
+  readonly redisGroupNameForLine: string;
 
   constructor(env: NodeJS.ProcessEnv) {
     this.appName = getStringValue(env, "APP_NAME");
@@ -16,8 +16,14 @@ export class Env {
     this.encryptionPassword = getSecretStringValue(env, "ENCRYPTION_PASSWORD");
     this.redisHost = getStringValue(env, "REDIS_HOST");
     this.redisPort = getNumberValue(env, "REDIS_PORT");
-    this.redisStreamName = getStringValue(env, "REDIS_STREAM_NAME");
-    this.redisGroupName = getStringValue(env, "REDIS_GROUP_NAME");
+    this.redisStreamNameForLine = getStringValue(
+      env,
+      "REDIS_STREAM_NAME_FOR_LINE"
+    );
+    this.redisGroupNameForLine = getStringValue(
+      env,
+      "REDIS_GROUP_NAME_FOR_LINE"
+    );
   }
 }
 

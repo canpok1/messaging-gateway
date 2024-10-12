@@ -54,23 +54,23 @@ async function readMessages(
   const client = new RedisClient(
     env.redisHost,
     env.redisPort,
-    env.redisStreamName,
-    env.redisGroupName
+    env.redisStreamNameForLine,
+    env.redisGroupNameForLine
   );
   logger.debug("make redis client", {
     redisHost: env.redisHost,
     redisPort: env.redisPort,
-    redisStreamName: env.redisStreamName,
-    redisGroupName: env.redisGroupName,
+    redisStreamName: env.redisStreamNameForLine,
+    redisGroupName: env.redisGroupNameForLine,
     consumer,
   });
 
   const created = await client.createConsumerGroupIfNotExists();
   if (created) {
-    logger.debug(`created consumer group ${env.redisGroupName}`);
+    logger.debug(`created consumer group ${env.redisGroupNameForLine}`);
   } else {
     logger.debug(
-      `skiped created consumer group ${env.redisGroupName}, group is exists`
+      `skiped created consumer group ${env.redisGroupNameForLine}, group is exists`
     );
   }
 
