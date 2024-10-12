@@ -30,3 +30,9 @@ export function createLogger(env: Env, options: object): Logger {
     transports: [new winston.transports.Console()],
   });
 }
+
+export function createNopLogger(): Logger {
+  return winston.createLogger({
+    silent: true,
+  });
+}

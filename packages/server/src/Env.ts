@@ -1,7 +1,7 @@
 import { SecretString } from "@messaging-gateway/lib";
 import { isLogLevelString, LogLevelString } from "@/Logger";
 
-export class Env {
+export interface Env {
   readonly appName: string;
   readonly logLevel: LogLevelString;
   readonly encryptionPassword: SecretString;
@@ -9,22 +9,18 @@ export class Env {
   readonly redisPort: number;
   readonly redisStreamNameForLine: string;
   readonly redisGroupNameForLine: string;
+}
 
-  constructor(env: NodeJS.ProcessEnv) {
-    this.appName = getStringValue(env, "APP_NAME");
-    this.logLevel = getLogLevel(env, "LOG_LEVEL");
-    this.encryptionPassword = getSecretStringValue(env, "ENCRYPTION_PASSWORD");
-    this.redisHost = getStringValue(env, "REDIS_HOST");
-    this.redisPort = getNumberValue(env, "REDIS_PORT");
-    this.redisStreamNameForLine = getStringValue(
-      env,
-      "REDIS_STREAM_NAME_FOR_LINE"
-    );
-    this.redisGroupNameForLine = getStringValue(
-      env,
-      "REDIS_GROUP_NAME_FOR_LINE"
-    );
-  }
+export function createEnvFromProcessEnv(env: NodeJS.ProcessEnv): Env {
+  return {
+    appName: getStringValue(env, "APP_NAME"),
+    logLevel: getLogLevel(env, "LOG_LEVEL"),
+    encryptionPassword: getSecretStringValue(env, "ENCRYPTION_PASSWORD"),
+    redisHost: getStringValue(env, "REDIS_HOST"),
+    redisPort: getNumberValue(env, "REDIS_PORT"),
+    redisStreamNameForLine: getStringValue(env, "REDIS_STREAM_NAME_FOR_LINE"),
+    redisGroupNameForLine: getStringValue(env, "REDIS_GROUP_NAME_FOR_LINE"),
+  };
 }
 
 function getStringValue(
