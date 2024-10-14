@@ -10,6 +10,15 @@ concurrency:
 jobs:
   code_test:
     runs-on: ubuntu-latest
+    env:
+      APP_NAME: messaging-gateway-ci-test
+      LOG_LEVEL: error
+      ENCRYPTION_PASSWORD: password
+      REDIS_STREAM_NAME_FOR_LINE: test-stream
+      REDIS_GROUP_NAME_FOR_LINE: processor
+    services:
+      redis:
+        image: redis:7.4
     steps:
       - uses: actions/checkout@v4
 
