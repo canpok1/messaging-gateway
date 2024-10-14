@@ -3,12 +3,12 @@
   "version": "1.0.0",
   "private": true,
   "scripts": {
-    "dev": "dotenv -e ../../.devcontainer/db.env dotenv -e ../../.devcontainer/redis.env -e .env vite",
+    "dev": "dotenv -e ../../.devcontainer/db.env -e ../../.devcontainer/redis.env -e .env -- vite",
     "build": "vite build",
-    "start": "NODE_ENV=production dotenv -e ../../.devcontainer/.db.env -e ../../.devcontainer/redis.env -e .env node ./dist/Index.mjs",
+    "start": "NODE_ENV=production dotenv -e ../../.devcontainer/.db.env -e ../../.devcontainer/redis.env -e .env -- node ./dist/Index.mjs",
     "generate:api": "npx openapi-typescript ./openapi.yml -o ./src/types/api.gen.ts",
-    "test": "dotenv -e ../../.devcontainer/db.test.env dotenv -e ../../.devcontainer/redis.test.env -e .env vitest",
-    "test:coverage": "dotenv -e ../../.devcontainer/db.test.env dotenv -e ../../.devcontainer/redis.test.env -e .env vitest run --coverage"
+    "test": "dotenv -e ../../.devcontainer/db.test.env -e ../../.devcontainer/redis.test.env -e .env -- vitest",
+    "test:coverage": "dotenv -e ../../.devcontainer/db.test.env -e ../../.devcontainer/redis.test.env -e .env -- vitest run --coverage"
   },
   "dependencies": {
     "@messaging-gateway/lib": "file:../lib",

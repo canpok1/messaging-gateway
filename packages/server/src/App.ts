@@ -15,17 +15,17 @@ export function createApp(env: Env, logger: Logger): express.Express {
     res.send(`running ${env.appName}`);
   });
   app.post("/api/line/v2/bot/message/push", async (req, res) => {
-    await postMessage(env, req, res);
+    await postMessage(env, logger, req, res);
   });
   app.post("/api/line/webhook/events", async (req, res) => {
-    await postEvent(env, req, res);
+    await postEvent(env, logger, req, res);
   });
   app.get("/api/line/webhook/messages/new", async (req, res) => {
-    await getNewMessage(env, req, res);
+    await getNewMessage(env, logger, req, res);
   });
 
   app.use((err, _req, res, _next) => {
-    handleError(env, err, res);
+    handleError(env, logger, err, res);
   });
 
   return app;

@@ -1,14 +1,12 @@
 import { Env } from "@/Env";
-import { createLogger } from "@/Logger";
+import { Logger } from "@/Logger";
 import { RequestParamError } from "@/Request";
 import { ErrorObject } from "@/types/api";
 
-export function handleError(env: Env, err, res) {
+export function handleError(env: Env, logger: Logger, err, res) {
   if (!err) {
     return;
   }
-
-  const logger = createLogger(env, {});
 
   if (err instanceof RequestParamError) {
     const errObj: ErrorObject = { message: err.message };
