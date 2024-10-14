@@ -33,6 +33,21 @@ services:
       interval: "10s"
       retries: 30
 
+  db-test:
+    container_name: messaging-gateway_db-test
+    image: "mariadb:11.4"
+    environment:
+      MYSQL_RANDOM_ROOT_PASSWORD: "yes"
+    env_file:
+      - "db.test.env"
+    ports:
+      - "13307:3306"
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping"]
+      start_period: "10s"
+      interval: "10s"
+      retries: 30
+
   redis:
     container_name: messaging-gateway_redis
     image: "redis:7.4"

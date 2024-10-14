@@ -3,10 +3,12 @@
   "version": "1.0.0",
   "private": true,
   "scripts": {
-    "dev": "dotenv -e ../../.devcontainer/db.env -e .env vite",
+    "dev": "dotenv -e ../../.devcontainer/db.env dotenv -e ../../.devcontainer/redis.env -e .env vite",
     "build": "vite build",
-    "start": "NODE_ENV=production dotenv -e ../../.devcontainer/.db.env -e .env node ./dist/Index.mjs",
-    "generate:api": "npx openapi-typescript ./openapi.yml -o ./src/types/api.gen.ts"
+    "start": "NODE_ENV=production dotenv -e ../../.devcontainer/.db.env -e ../../.devcontainer/redis.env -e .env node ./dist/Index.mjs",
+    "generate:api": "npx openapi-typescript ./openapi.yml -o ./src/types/api.gen.ts",
+    "test": "dotenv -e ../../.devcontainer/db.test.env dotenv -e ../../.devcontainer/redis.test.env -e .env vitest",
+    "test:coverage": "dotenv -e ../../.devcontainer/db.test.env dotenv -e ../../.devcontainer/redis.test.env -e .env vitest run --coverage"
   },
   "dependencies": {
     "@messaging-gateway/lib": "file:../lib",
@@ -17,6 +19,7 @@
   "devDependencies": {
     "@types/express": "^4.17.21",
     "@types/uuid": "^10.0.0",
+    "supertest": "^7.0.0",
     "typescript": "5.6.3",
     "vite": "^4.5.5",
     "vite-plugin-node": "^3.1.0"
