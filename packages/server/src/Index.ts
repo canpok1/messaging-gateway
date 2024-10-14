@@ -1,8 +1,8 @@
-import { createEnvFromProcessEnv, Env } from "@/Env";
+import { createEnvParamFromProcessEnv, Env } from "@/Env";
 import { createLogger } from "@/Logger";
 import { createApp } from "@/App";
 
-const env = createEnvFromProcessEnv(process.env);
+const env = createEnvParamFromProcessEnv(process.env);
 const logger = createLogger(env, {});
 const app = createApp(env, logger);
 

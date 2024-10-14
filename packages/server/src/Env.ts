@@ -13,7 +13,7 @@ export interface EnvParam {
 
 export type Env = Readonly<EnvParam>;
 
-export function createEnvFromProcessEnv(env: NodeJS.ProcessEnv): Env {
+export function createEnvParamFromProcessEnv(env: NodeJS.ProcessEnv): EnvParam {
   return {
     appName: getStringValue(env, "APP_NAME"),
     logLevel: getLogLevel(env, "LOG_LEVEL"),

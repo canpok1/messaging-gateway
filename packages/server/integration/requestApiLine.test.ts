@@ -2,20 +2,15 @@ import { createApp } from "@/App";
 import { createNopLogger } from "@/Logger";
 import { it } from "vitest";
 import request from "supertest";
-import { Env } from "@/Env";
+import { createEnvParamFromProcessEnv, Env } from "@/Env";
 import { paths } from "@/types/api.gen";
 import { cleanupRedisStream, createRedisClient } from "./utils";
+import { v4 as uuidv4 } from "uuid";
 
 function createEnv(): Env {
-  return {
-    appName: "dummy-app-name",
-    logLevel: "error",
-    encryptionPassword: undefined,
-    redisHost: "redis",
-    redisPort: 6379,
-    redisStreamNameForLine: "test:line:webhook",
-    redisGroupNameForLine: "processor",
-  };
+  const env = createEnvParamFromProcessEnv(process.env);
+  env.redisStreamNameForLine = uuidv4();
+  return env;
 }
 
 const logger = createNopLogger();
