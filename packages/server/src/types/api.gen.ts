@@ -352,8 +352,8 @@ export interface components {
             signature: string;
             /** @description Webhookイベントを受信すべきボットのユーザーID。 */
             destination: string;
-            /** @description 受信したWebhookイベントオブジェクトのJSON文字列。 */
-            events: string;
+            /** @description 受信したWebhookイベントオブジェクトの配列。 */
+            events: components["schemas"]["WebhookEventObject"][];
         };
         /** @description エラー情報。 */
         ErrorObject: {

@@ -3,6 +3,8 @@ import { Redis } from "ioredis";
 import { webhook } from "@line/bot-sdk";
 import { Logger } from "winston";
 
+export const MESSAGE_KEY = "message";
+
 export type Id = string;
 
 export type WebhookStreamObject = {
@@ -35,7 +37,7 @@ export class RedisClient {
     return await this.client.xadd(
       this.streamName,
       "*",
-      "message",
+      MESSAGE_KEY,
       JSON.stringify(object)
     );
   }
@@ -61,6 +63,8 @@ export class RedisClient {
       "GROUP",
       this.groupName,
       consumerName,
+      "COUNT",
+      maxCount,
       "STREAMS",
       this.streamName,
       ">"
@@ -80,14 +84,14 @@ export class RedisClient {
     for (const [messageId, fields] of messages) {
       const childLogger = logger.child({ messageId });
       try {
-        const value = this.findValue(fields, "message");
+        const value = this.findValue(fields, MESSAGE_KEY);
         const message = JSON.parse(value) as WebhookStreamObject;
         messageObjects.push({
           messageId: messageId,
           requestId: message.requestId,
           signature: message.signature,
           destination: message.destination,
-          events: JSON.stringify(message.events),
+          events: message.events,
         });
       } catch (err) {
         childLogger.error(err);
@@ -143,7 +147,7 @@ export class RedisClient {
             message: err,
           });
         }
-        if (messages.length >= maxCount) {
+        if (maxCount && messages.length >= maxCount) {
           shouldContinue = false;
           break;
         }
@@ -151,6 +155,10 @@ export class RedisClient {
     }
 
     return messages;
+  }
+
+  async countStreamEntries(): Promise<number> {
+    return await this.client.xlen(this.streamName);
   }
 
   private async xpending(

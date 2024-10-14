@@ -16,12 +16,14 @@ function createEnv(): Env {
   };
 }
 
-it("GET /", async () => {
-  const logger = createNopLogger();
-  const env = createEnv();
-  const app = createApp(env, logger);
+describe("GET /", () => {
+  it("正常系", async () => {
+    const logger = createNopLogger();
+    const env = createEnv();
+    const app = createApp(env, logger);
 
-  const response = await request(app).get("/").expect(200);
+    const response = await request(app).get("/").expect(200);
 
-  expect(response.text).toEqual(`running ${env.appName}`);
+    expect(response.text).toEqual(`running ${env.appName}`);
+  });
 });

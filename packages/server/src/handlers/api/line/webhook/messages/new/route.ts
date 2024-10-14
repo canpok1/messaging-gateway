@@ -18,7 +18,7 @@ export async function GET(env: Env, req: Request, res: Response) {
   const params = new RequestDataParser(req);
 
   const consumer = params.getQueryParamAsString("consumer");
-  const maxCount = params.getQueryParamAsNumberOrUndefined("max_count");
+  const maxCount = params.getQueryParamAsNumberOrUndefined("max_count") || 0;
   const maxIdleTimeMs =
     params.getQueryParamAsNumberOrUndefined("max_idle_time_ms") || 60000;
   const maxDeliveryCount =
@@ -65,6 +65,11 @@ async function readMessages(
     consumer,
   });
 
+  const entriesCount = await client.countStreamEntries();
+  if (entriesCount === 0) {
+    return [];
+  }
+
   const created = await client.createConsumerGroupIfNotExists();
   if (created) {
     logger.debug(`created consumer group ${env.redisGroupNameForLine}`);
@@ -74,21 +79,30 @@ async function readMessages(
     );
   }
 
-  const newMessages = await client.readNewMessages(logger, consumer, maxCount);
-  logger.debug("read new messages", { newMessages });
-
-  if (newMessages.length >= maxCount) {
-    return newMessages;
-  }
-
   const longPendingMessages = await client.readLongPendingMessages(
     logger,
     consumer,
     maxIdleTimeMs,
-    maxCount - newMessages.length,
+    maxCount,
     maxDeliveryCount
   );
   logger.debug("read long pending messages", { longPendingMessages });
 
-  return newMessages.concat(longPendingMessages);
+  if (maxCount && longPendingMessages.length >= maxCount) {
+    return longPendingMessages;
+  }
+
+  const readNewMessagesMaxCount = Math.max(
+    maxCount - longPendingMessages.length,
+    0
+  );
+
+  const newMessages = await client.readNewMessages(
+    logger,
+    consumer,
+    readNewMessagesMaxCount
+  );
+  logger.debug("read new messages", { newMessages });
+
+  return longPendingMessages.concat(newMessages);
 }
