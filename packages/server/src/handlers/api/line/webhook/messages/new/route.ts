@@ -1,19 +1,23 @@
 import { Env } from "@/Env";
-import { createLogger } from "@/Logger";
 import { v4 as uuidv4 } from "uuid";
 import type { WebhookMessageObject } from "@/types/api";
 import { RequestDataParser } from "@/Request";
 import { RedisClient } from "@/Redis";
 import { paths } from "@/types/api.gen";
-import { Logger } from "winston";
 import { Request, Response } from "express";
+import { Logger } from "@/Logger";
 
 type GetResponse =
   paths["/api/line/webhook/messages/new"]["get"]["responses"]["200"]["content"]["application/json"];
 
-export async function GET(env: Env, req: Request, res: Response) {
+export async function GET(
+  env: Env,
+  parentLogger: Logger,
+  req: Request,
+  res: Response
+) {
   const requestId = uuidv4();
-  const logger = createLogger(env, { requestId });
+  const logger = parentLogger.child({ requestId });
 
   const params = new RequestDataParser(req);
 

@@ -4,17 +4,18 @@ import type { ErrorObject } from "@/types/api";
 import { RedisClient, WebhookStreamObject } from "@/Redis";
 import express from "express";
 import { Env } from "@/Env";
-import { createLogger } from "@/Logger";
+import { Logger } from "@/Logger";
 
 const HEADER_SIGNATURE = "x-line-signature";
 
 export async function POST(
   env: Env,
+  parentLogger: Logger,
   req: express.Request,
   res: express.Response
 ) {
   const requestId = uuidv4();
-  const logger = createLogger(env, { requestId });
+  const logger = parentLogger.child({ requestId });
 
   const signature: string = req.get(HEADER_SIGNATURE);
   if (!signature) {

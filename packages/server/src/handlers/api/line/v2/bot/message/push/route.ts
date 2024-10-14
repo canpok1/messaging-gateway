@@ -7,17 +7,18 @@ import { PrismaClient } from "@prisma/client";
 import { messagingApi, HTTPFetchError } from "@line/bot-sdk";
 import { v4 as uuidv4 } from "uuid";
 import { Env } from "@/Env";
-import { createLogger, Logger } from "@/Logger";
+import { Logger } from "@/Logger";
 import { ErrorObject } from "@/types/api";
 import express from "express";
 
 export async function POST(
   env: Env,
+  parentLogger: Logger,
   req: express.Request,
   res: express.Response
 ) {
   const requestId = uuidv4();
-  const logger = createLogger(env, { requestId });
+  const logger = parentLogger.child({ requestId });
 
   const channelId = req.get("X-MessagingGateway-Line-Channel-Id");
   const body = req.body as messagingApi.PushMessageRequest;
