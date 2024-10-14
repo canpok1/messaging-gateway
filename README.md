@@ -5,3 +5,4 @@
 - [スキーマ定義](database/README.md)
 - テストカバレッジ
   - [lib](coverage/lib/index.html)
+  - [server](coverage/server/index.html)
