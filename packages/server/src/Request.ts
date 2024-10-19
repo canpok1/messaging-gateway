@@ -1,4 +1,5 @@
 import { Request } from "express";
+import { RequestParamError } from "@/Error";
 export class RequestDataParser {
   private req: Request;
 
@@ -45,12 +46,5 @@ export class RequestDataParser {
     }
 
     return numberValue;
-  }
-}
-
-export class RequestParamError extends Error {
-  constructor(message: string) {
-    super(message);
-    this.name = "RequestParamError";
   }
 }

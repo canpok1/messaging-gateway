@@ -162,6 +162,10 @@ export class RedisClient {
     return await this.client.xlen(this.streamName);
   }
 
+  async deleteMessage(messageId: string): Promise<number> {
+    return await this.xack(messageId);
+  }
+
   private async xpending(
     maxIdleTimeMs: number,
     begin: string,
@@ -200,6 +204,10 @@ export class RedisClient {
     const fields = result[0][1] as string[];
     const value = this.findValue(fields, "message");
     return JSON.parse(value);
+  }
+
+  private async xack(messageId: string): Promise<number> {
+    return await this.client.xack(this.streamName, this.groupName, messageId);
   }
 
   private findValue(fields: string[], key: string): string {
