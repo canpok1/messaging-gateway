@@ -4,9 +4,10 @@
   "private": true,
   "scripts": {
     "dev": "dotenv -e ../../.devcontainer/db.env -e ../../.devcontainer/redis.env -e .env -- vite",
-    "build": "vite build",
+    "build": "tsc --noEmit && vite build",
     "start": "NODE_ENV=production dotenv -e ../../.devcontainer/.db.env -e ../../.devcontainer/redis.env -e .env -- node ./dist/Index.mjs",
     "generate:api": "npx openapi-typescript ./openapi.yml -o ./src/types/api.gen.ts",
+    "typecheck": "tsc --noEmit",
     "test": "dotenv -e ../../.devcontainer/db.test.env -e ../../.devcontainer/redis.test.env -e .env -- vitest",
     "test:coverage": "dotenv -e ../../.devcontainer/db.test.env -e ../../.devcontainer/redis.test.env -e .env -- vitest run --coverage"
   },

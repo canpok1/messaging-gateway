@@ -22,14 +22,15 @@ export class RedisClient {
   constructor(
     host: string,
     port: number,
-    streamName: string,
+    streamPrefix: string,
+    channelId: string,
     groupName: string
   ) {
     this.client = new Redis({
       host,
       port,
     });
-    this.streamName = streamName;
+    this.streamName = `${streamPrefix}:${channelId}`;
     this.groupName = groupName;
   }
 

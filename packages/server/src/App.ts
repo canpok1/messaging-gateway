@@ -17,10 +17,10 @@ export function createApp(env: Env, logger: Logger): express.Express {
   app.post("/api/line/v2/bot/message/push", async (req, res) => {
     await postMessage(env, logger, req, res);
   });
-  app.post("/api/line/webhook/events", async (req, res) => {
+  app.post("/api/line/webhook/:channelId/events", async (req, res) => {
     await postEvent(env, logger, req, res);
   });
-  app.get("/api/line/webhook/messages/new", async (req, res) => {
+  app.get("/api/line/webhook/:channelId/messages/new", async (req, res) => {
     await getNewMessage(env, logger, req, res);
   });
 

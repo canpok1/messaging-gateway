@@ -16,7 +16,7 @@ jobs:
       ENCRYPTION_PASSWORD: password
       REDIS_HOST: localhost
       REDIS_PORT: 6379
-      REDIS_STREAM_NAME_FOR_LINE: test-stream
+      REDIS_STREAM_PREFIX_FOR_LINE: test-stream
       REDIS_GROUP_NAME_FOR_LINE: processor
     services:
       redis:

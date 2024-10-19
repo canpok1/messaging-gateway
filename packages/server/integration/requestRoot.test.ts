@@ -11,7 +11,7 @@ function createEnv(): Env {
     encryptionPassword: undefined,
     redisHost: "redis",
     redisPort: 6379,
-    redisStreamNameForLine: "test:line:webhook",
+    redisStreamPrefixForLine: "test:line:webhook",
     redisGroupNameForLine: "processor",
   };
 }

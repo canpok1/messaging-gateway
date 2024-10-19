@@ -109,7 +109,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/line/webhook/messages/{messageId}": {
+    "/api/line/webhook/{channelId}/messages/{messageId}": {
         parameters: {
             query?: never;
             header?: never;
@@ -128,6 +128,8 @@ export interface paths {
                 query?: never;
                 header?: never;
                 path: {
+                    /** @description チャンネルID */
+                    channelId: string;
                     /** @description メッセージID */
                     messageId: string;
                 };
@@ -169,7 +171,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/line/webhook/messages/new": {
+    "/api/line/webhook/{channelId}/messages/new": {
         parameters: {
             query?: never;
             header?: never;
@@ -205,7 +207,10 @@ export interface paths {
                     max_delivery_count?: number;
                 };
                 header?: never;
-                path?: never;
+                path: {
+                    /** @description チャンネルID */
+                    channelId: string;
+                };
                 cookie?: never;
             };
             requestBody?: never;
@@ -250,7 +255,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/line/webhook/events": {
+    "/api/line/webhook/{channelId}/events": {
         parameters: {
             query?: never;
             header?: never;
@@ -275,7 +280,10 @@ export interface paths {
                      *      */
                     "x-line-signature": string;
                 };
-                path?: never;
+                path: {
+                    /** @description チャンネルID */
+                    channelId: string;
+                };
                 cookie?: never;
             };
             requestBody: {
