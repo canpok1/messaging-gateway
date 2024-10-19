@@ -6,6 +6,7 @@ import express from "express";
 import { Env } from "@/Env";
 import { Logger } from "@/Logger";
 import { RequestDataParser } from "@/Request";
+import { RequestParamError } from "@/Error";
 
 const HEADER_SIGNATURE = "x-line-signature";
 
@@ -23,11 +24,9 @@ export async function POST(
   const channelId = params.getPathParamAsString("channelId");
   const signature: string = req.get(HEADER_SIGNATURE);
   if (!signature) {
-    const errObj: ErrorObject = {
-      message: `not found required header[${HEADER_SIGNATURE}]`,
-    };
-    res.status(400).json(errObj);
-    return;
+    throw new RequestParamError(
+      `not found required header[${HEADER_SIGNATURE}]`
+    );
   }
 
   const body = req.body as webhook.CallbackRequest;
