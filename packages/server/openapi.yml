@@ -264,6 +264,13 @@ paths:
             application/json:
               schema:
                 type: object
+        "400":
+          description: |
+            必須パラメータの不足
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorObject"
         "500":
           description: |
             内部エラー

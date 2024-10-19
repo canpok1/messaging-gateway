@@ -307,6 +307,16 @@ export interface paths {
                         "application/json": Record<string, never>;
                     };
                 };
+                /** @description 必須パラメータの不足
+                 *      */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorObject"];
+                    };
+                };
                 /** @description 内部エラー
                  *      */
                 500: {

@@ -52,6 +52,24 @@ describe("POST /api/line/webhook/{channelId}/events", () => {
     const messageCount = await redis.xlen(streamName);
     expect(messageCount).toEqual(1);
   });
+
+  describe("異常系（400）", async () => {
+    it("リクエストヘッダーなし（x-line-signature）", async () => {
+      const requestBody: RequestBody = {
+        destination: "dummy destination",
+        events: ["dummy event 1", "dummy event 2"],
+      };
+
+      const app = createApp(env, logger);
+
+      const response = await request(app)
+        .post(url)
+        .send(requestBody)
+        .expect(400);
+
+      expect(response.body).toHaveProperty("message");
+    });
+  });
 });
 
 describe("GET /api/line/webhook/{channelId}/messages/new", () => {
@@ -360,6 +378,17 @@ describe("GET /api/line/webhook/{channelId}/messages/new", () => {
           undeliveredMessage1,
         ]);
       });
+    });
+  });
+  describe("正常系（200）", () => {
+    const channelId = "dummy-channel-id";
+    const url = `/api/line/webhook/${channelId}/messages/new`;
+
+    it("必須パラメータ不足", async () => {
+      const app = createApp(env, logger);
+      const response = await request(app).get(url).expect(400);
+
+      expect(response.body).toHaveProperty("message");
     });
   });
 });
