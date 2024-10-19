@@ -7,7 +7,7 @@ export interface EnvParam {
   encryptionPassword: SecretString;
   redisHost: string;
   redisPort: number;
-  redisStreamNameForLine: string;
+  redisStreamPrefixForLine: string;
   redisGroupNameForLine: string;
 }
 
@@ -20,7 +20,10 @@ export function createEnvParamFromProcessEnv(env: NodeJS.ProcessEnv): EnvParam {
     encryptionPassword: getSecretStringValue(env, "ENCRYPTION_PASSWORD"),
     redisHost: getStringValue(env, "REDIS_HOST"),
     redisPort: getNumberValue(env, "REDIS_PORT"),
-    redisStreamNameForLine: getStringValue(env, "REDIS_STREAM_NAME_FOR_LINE"),
+    redisStreamPrefixForLine: getStringValue(
+      env,
+      "REDIS_STREAM_PREFIX_FOR_LINE"
+    ),
     redisGroupNameForLine: getStringValue(env, "REDIS_GROUP_NAME_FOR_LINE"),
   };
 }

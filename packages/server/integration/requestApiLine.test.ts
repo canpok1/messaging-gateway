@@ -14,7 +14,7 @@ function sleep(ms: number): Promise<void> {
 
 function createEnv(): Env {
   const env = createEnvParamFromProcessEnv(process.env);
-  env.redisStreamNameForLine = `test:${uuidv4()}`;
+  env.redisStreamPrefixForLine = `test:${uuidv4()}`;
   return env;
 }
 
@@ -27,7 +27,7 @@ describe("POST /api/line/webhook/{channelId}/events", () => {
     paths["/api/line/webhook/{channelId}/events"]["post"]["requestBody"]["content"]["application/json"];
   const channelId = "dummy-channel-id";
   const url = `/api/line/webhook/${channelId}/events`;
-  const streamName = `${env.redisStreamNameForLine}:${channelId}`;
+  const streamName = `${env.redisStreamPrefixForLine}:${channelId}`;
 
   afterEach(async () => {
     await cleanupRedisStream(env, channelId);
@@ -58,7 +58,7 @@ describe("GET /api/line/webhook/{channelId}/messages/new", () => {
   describe("正常系（200）", () => {
     const channelId = "dummy-channel-id";
     const url = `/api/line/webhook/${channelId}/messages/new`;
-    const streamName = `${env.redisStreamNameForLine}:${channelId}`;
+    const streamName = `${env.redisStreamPrefixForLine}:${channelId}`;
 
     afterEach(async () => {
       await cleanupRedisStream(env, channelId);
