@@ -1,9 +1,8 @@
-import { Env } from "@/Env";
 import { Logger } from "@/Logger";
-import { RequestParamError } from "@/Request";
+import { NotFoundError, RequestParamError } from "@/Error";
 import { ErrorObject } from "@/types/api";
 
-export function handleError(env: Env, logger: Logger, err, res) {
+export function handleError(logger: Logger, err, res) {
   if (!err) {
     return;
   }
@@ -11,6 +10,12 @@ export function handleError(env: Env, logger: Logger, err, res) {
   if (err instanceof RequestParamError) {
     const errObj: ErrorObject = { message: err.message };
     res.status(400).json(errObj);
+    return;
+  }
+
+  if (err instanceof NotFoundError) {
+    const errObj: ErrorObject = { message: err.message };
+    res.status(404).json(errObj);
     return;
   }
 

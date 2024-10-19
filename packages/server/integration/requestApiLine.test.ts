@@ -363,3 +363,105 @@ describe("GET /api/line/webhook/{channelId}/messages/new", () => {
     });
   });
 });
+
+describe("DELETE /api/line/webhook/{channelId}/messages/{messageId}", () => {
+  const channelId = "dummy-channel-id";
+  const existingMessageId = "1111-1";
+  const streamName = `${env.redisStreamPrefixForLine}:${channelId}`;
+
+  describe("正常系（200）", () => {
+    const consumer = "consumer";
+    beforeEach(async () => {
+      await redis.xadd(
+        streamName,
+        existingMessageId,
+        "message",
+        JSON.stringify({})
+      );
+      await redis.xgroup("CREATE", streamName, env.redisGroupNameForLine, 0);
+      await redis.xreadgroup(
+        "GROUP",
+        env.redisGroupNameForLine,
+        consumer,
+        "STREAMS",
+        streamName,
+        ">"
+      );
+    });
+
+    afterEach(async () => {
+      await cleanupRedisStream(env, channelId);
+    });
+
+    it("ステータスコード200", async () => {
+      const url = `/api/line/webhook/${channelId}/messages/${existingMessageId}`;
+      const app = createApp(env, logger);
+
+      const response = await request(app).delete(url).expect(200);
+
+      expect(response.body).toEqual({});
+    });
+  });
+
+  describe("異常系(404)", () => {
+    const nonexistentMessageId = "1111-2";
+    const url = `/api/line/webhook/${channelId}/messages/${nonexistentMessageId}`;
+
+    describe("ストリームなし", () => {
+      it("ステータスコード404", async () => {
+        const app = createApp(env, logger);
+
+        const response = await request(app).delete(url).expect(404);
+
+        expect(response.body).toHaveProperty("message");
+      });
+    });
+
+    describe("グループなし", () => {
+      beforeEach(async () => {
+        await redis.xadd(
+          streamName,
+          existingMessageId,
+          "message",
+          JSON.stringify({})
+        );
+      });
+
+      afterEach(async () => {
+        await cleanupRedisStream(env, channelId);
+      });
+
+      it("ステータスコード404", async () => {
+        const app = createApp(env, logger);
+
+        const response = await request(app).delete(url).expect(404);
+
+        expect(response.body).toHaveProperty("message");
+      });
+    });
+
+    describe("メッセージなし", () => {
+      beforeEach(async () => {
+        await redis.xadd(
+          streamName,
+          existingMessageId,
+          "message",
+          JSON.stringify({})
+        );
+        await redis.xgroup("CREATE", streamName, env.redisGroupNameForLine, 0);
+      });
+
+      afterEach(async () => {
+        await cleanupRedisStream(env, channelId);
+      });
+
+      it("ステータスコード404", async () => {
+        const app = createApp(env, logger);
+
+        const response = await request(app).delete(url).expect(404);
+
+        expect(response.body).toHaveProperty("message");
+      });
+    });
+  });
+});
