@@ -23,12 +23,17 @@ export async function GET(
 
   const channelId = params.getPathParamAsString("channelId");
   const consumer = params.getQueryParamAsString("consumer");
-  const maxCount = params.getQueryParamAsNumberOrUndefined("max_count") || 0;
-  const maxIdleTimeMs =
-    params.getQueryParamAsNumberOrUndefined("max_idle_time_ms") || 60000;
-  const maxDeliveryCount =
-    params.getQueryParamAsNumberOrUndefined("max_delivery_count") || 3;
+  const maxCount = params.getQueryParamAsNumberWithDefault("max_count", 0);
+  const maxIdleTimeMs = params.getQueryParamAsNumberWithDefault(
+    "max_idle_time_ms",
+    60000
+  );
+  const maxDeliveryCount = params.getQueryParamAsNumberWithDefault(
+    "max_delivery_count",
+    3
+  );
   logger.info("received request", {
+    channelId,
     consumer,
     maxCount,
     maxIdleTimeMs,
@@ -69,8 +74,8 @@ async function readMessages(
     redisHost: env.redisHost,
     redisPort: env.redisPort,
     redisStreamName: env.redisStreamPrefixForLine,
+    channelId,
     redisGroupName: env.redisGroupNameForLine,
-    consumer,
   });
 
   const entriesCount = await client.countStreamEntries();

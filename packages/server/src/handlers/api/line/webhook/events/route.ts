@@ -22,15 +22,10 @@ export async function POST(
   const params = new RequestDataParser(req);
 
   const channelId = params.getPathParamAsString("channelId");
-  const signature: string = req.get(HEADER_SIGNATURE);
-  if (!signature) {
-    throw new RequestParamError(
-      `not found required header[${HEADER_SIGNATURE}]`
-    );
-  }
+  const signature = params.getHeaderAsString(HEADER_SIGNATURE);
 
   const body = req.body as webhook.CallbackRequest;
-  logger.info("received request", { signature, body });
+  logger.info("received request", { channelId, signature, body });
 
   const client = new RedisClient(
     env.redisHost,
@@ -43,6 +38,8 @@ export async function POST(
     redisHost: env.redisHost,
     redisPort: env.redisPort,
     redisStreamName: env.redisStreamPrefixForLine,
+    channelId,
+    redisGroupName: env.redisGroupNameForLine,
   });
 
   const streamObj: WebhookStreamObject = {
