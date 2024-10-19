@@ -5,6 +5,7 @@ import { RedisClient, WebhookStreamObject } from "@/Redis";
 import express from "express";
 import { Env } from "@/Env";
 import { Logger } from "@/Logger";
+import { RequestDataParser } from "@/Request";
 
 const HEADER_SIGNATURE = "x-line-signature";
 
@@ -17,6 +18,9 @@ export async function POST(
   const requestId = uuidv4();
   const logger = parentLogger.child({ requestId });
 
+  const params = new RequestDataParser(req);
+
+  const channelId = params.getPathParamAsString("channelId");
   const signature: string = req.get(HEADER_SIGNATURE);
   if (!signature) {
     const errObj: ErrorObject = {
@@ -33,6 +37,7 @@ export async function POST(
     env.redisHost,
     env.redisPort,
     env.redisStreamNameForLine,
+    channelId,
     env.redisGroupNameForLine
   );
   logger.debug("make redis client", {

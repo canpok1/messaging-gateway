@@ -22,13 +22,16 @@ const logger = createNopLogger();
 const env = createEnv();
 const redis = createRedisClient(env);
 
-afterEach(async () => {
-  await cleanupRedisStream(env);
-});
-
-describe("POST /api/line/webhook/events", () => {
+describe("POST /api/line/webhook/{channelId}/events", () => {
   type RequestBody =
-    paths["/api/line/webhook/events"]["post"]["requestBody"]["content"]["application/json"];
+    paths["/api/line/webhook/{channelId}/events"]["post"]["requestBody"]["content"]["application/json"];
+  const channelId = "dummy-channel-id";
+  const url = `/api/line/webhook/${channelId}/events`;
+  const streamName = `${env.redisStreamNameForLine}:${channelId}`;
+
+  afterEach(async () => {
+    await cleanupRedisStream(env, channelId);
+  });
 
   it("正常系（200）", async () => {
     const requestBody: RequestBody = {
@@ -39,32 +42,41 @@ describe("POST /api/line/webhook/events", () => {
     const app = createApp(env, logger);
 
     const response = await request(app)
-      .post("/api/line/webhook/events")
+      .post(url)
       .set("x-line-signature", "dummy-signature")
       .send(requestBody)
       .expect(200);
 
     expect(response.body).toEqual({});
 
-    const messageCount = await redis.xlen(env.redisStreamNameForLine);
+    const messageCount = await redis.xlen(streamName);
     expect(messageCount).toEqual(1);
   });
 });
 
-describe("GET /api/line/webhook/messages/new", () => {
+describe("GET /api/line/webhook/{channelId}/messages/new", () => {
   describe("正常系（200）", () => {
+    const channelId = "dummy-channel-id";
+    const url = `/api/line/webhook/${channelId}/messages/new`;
+    const streamName = `${env.redisStreamNameForLine}:${channelId}`;
+
+    afterEach(async () => {
+      await cleanupRedisStream(env, channelId);
+    });
+
     describe("ストリームなし", () => {
       it("取得したメッセージは空配列", async () => {
         const app = createApp(env, logger);
 
         const response = await request(app)
-          .get("/api/line/webhook/messages/new")
+          .get(url)
           .query({ consumer: "dummy-consumer" })
           .expect(200);
 
         expect(response.body).toEqual({ messages: [] });
       });
     });
+
     describe("未配信メッセージあり", () => {
       const consumer = "consumer";
       const messageId = "12345-1";
@@ -77,7 +89,7 @@ describe("GET /api/line/webhook/messages/new", () => {
 
       beforeEach(async () => {
         await redis.xadd(
-          env.redisStreamNameForLine,
+          streamName,
           messageId,
           "message",
           JSON.stringify(message)
@@ -88,7 +100,7 @@ describe("GET /api/line/webhook/messages/new", () => {
         const app = createApp(env, logger);
 
         const response = await request(app)
-          .get("/api/line/webhook/messages/new")
+          .get(url)
           .query({ consumer })
           .expect(200);
 
@@ -110,23 +122,18 @@ describe("GET /api/line/webhook/messages/new", () => {
 
       beforeEach(async () => {
         await redis.xadd(
-          env.redisStreamNameForLine,
+          streamName,
           messageId,
           "message",
           JSON.stringify(message)
         );
-        await redis.xgroup(
-          "CREATE",
-          env.redisStreamNameForLine,
-          env.redisGroupNameForLine,
-          0
-        );
+        await redis.xgroup("CREATE", streamName, env.redisGroupNameForLine, 0);
         await redis.xreadgroup(
           "GROUP",
           env.redisGroupNameForLine,
           consumer,
           "STREAMS",
-          env.redisStreamNameForLine,
+          streamName,
           ">"
         );
       });
@@ -135,7 +142,7 @@ describe("GET /api/line/webhook/messages/new", () => {
         const app = createApp(env, logger);
 
         const response = await request(app)
-          .get("/api/line/webhook/messages/new")
+          .get(url)
           .query({
             consumer,
             max_count: 2,
@@ -153,7 +160,7 @@ describe("GET /api/line/webhook/messages/new", () => {
         const app = createApp(env, logger);
 
         const response = await request(app)
-          .get("/api/line/webhook/messages/new")
+          .get(url)
           .query({
             consumer: otherConsumer,
             max_count: 2,
@@ -175,7 +182,7 @@ describe("GET /api/line/webhook/messages/new", () => {
 
         const app = createApp(env, logger);
         const response = await request(app)
-          .get("/api/line/webhook/messages/new")
+          .get(url)
           .query({
             consumer: otherConsumer,
             max_count: 2,
@@ -204,23 +211,18 @@ describe("GET /api/line/webhook/messages/new", () => {
       beforeEach(async () => {
         // メッセージを追加して自身で読み取り（配信数は1回）
         await redis.xadd(
-          env.redisStreamNameForLine,
+          streamName,
           messageId,
           "message",
           JSON.stringify(message)
         );
-        await redis.xgroup(
-          "CREATE",
-          env.redisStreamNameForLine,
-          env.redisGroupNameForLine,
-          0
-        );
+        await redis.xgroup("CREATE", streamName, env.redisGroupNameForLine, 0);
         await redis.xreadgroup(
           "GROUP",
           env.redisGroupNameForLine,
           consumer,
           "STREAMS",
-          env.redisStreamNameForLine,
+          streamName,
           ">"
         );
         // 指定の配信回数になるまで自身宛に再配信
@@ -230,7 +232,7 @@ describe("GET /api/line/webhook/messages/new", () => {
           await sleep(maxIdleTimeMs * 5);
 
           await redis.xclaim(
-            env.redisStreamNameForLine,
+            streamName,
             env.redisGroupNameForLine,
             consumer,
             maxIdleTimeMs,
@@ -248,7 +250,7 @@ describe("GET /api/line/webhook/messages/new", () => {
 
         const app = createApp(env, logger);
         const response = await request(app)
-          .get("/api/line/webhook/messages/new")
+          .get(url)
           .query({
             consumer: otherConsumer,
             max_count: 2,
@@ -297,41 +299,36 @@ describe("GET /api/line/webhook/messages/new", () => {
       beforeEach(async () => {
         // メッセージを追加して他で読み取り
         await redis.xadd(
-          env.redisStreamNameForLine,
+          streamName,
           deliveredMessage1.messageId,
           "message",
           JSON.stringify(deliveredMessage1)
         );
         await redis.xadd(
-          env.redisStreamNameForLine,
+          streamName,
           deliveredMessage2.messageId,
           "message",
           JSON.stringify(deliveredMessage2)
         );
-        await redis.xgroup(
-          "CREATE",
-          env.redisStreamNameForLine,
-          env.redisGroupNameForLine,
-          0
-        );
+        await redis.xgroup("CREATE", streamName, env.redisGroupNameForLine, 0);
         await redis.xreadgroup(
           "GROUP",
           env.redisGroupNameForLine,
           otherConsumer,
           "STREAMS",
-          env.redisStreamNameForLine,
+          streamName,
           ">"
         );
 
         // メッセージを追加して配信しない
         await redis.xadd(
-          env.redisStreamNameForLine,
+          streamName,
           undeliveredMessage1.messageId,
           "message",
           JSON.stringify(undeliveredMessage1)
         );
         await redis.xadd(
-          env.redisStreamNameForLine,
+          streamName,
           undeliveredMessage2.messageId,
           "message",
           JSON.stringify(undeliveredMessage2)
@@ -346,7 +343,7 @@ describe("GET /api/line/webhook/messages/new", () => {
 
         const app = createApp(env, logger);
         const response = await request(app)
-          .get("/api/line/webhook/messages/new")
+          .get(url)
           .query({
             consumer,
             max_count: 3,

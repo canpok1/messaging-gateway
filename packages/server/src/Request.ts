@@ -6,6 +6,15 @@ export class RequestDataParser {
     this.req = req;
   }
 
+  getPathParamAsString(key: string): string {
+    const value = this.req.params[key];
+    if (!value) {
+      throw new RequestParamError(`${key} is required but was not found`);
+    }
+
+    return value;
+  }
+
   getQueryParamAsStringOrUndefined(key: string): string | undefined {
     const value = this.req.query[key];
     if (typeof value === "string") {

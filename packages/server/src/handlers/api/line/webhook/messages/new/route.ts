@@ -8,7 +8,7 @@ import { Request, Response } from "express";
 import { Logger } from "@/Logger";
 
 type GetResponse =
-  paths["/api/line/webhook/messages/new"]["get"]["responses"]["200"]["content"]["application/json"];
+  paths["/api/line/webhook/{channelId}/messages/new"]["get"]["responses"]["200"]["content"]["application/json"];
 
 export async function GET(
   env: Env,
@@ -21,6 +21,7 @@ export async function GET(
 
   const params = new RequestDataParser(req);
 
+  const channelId = params.getPathParamAsString("channelId");
   const consumer = params.getQueryParamAsString("consumer");
   const maxCount = params.getQueryParamAsNumberOrUndefined("max_count") || 0;
   const maxIdleTimeMs =
@@ -37,6 +38,7 @@ export async function GET(
   const messages = await readMessages(
     env,
     logger,
+    channelId,
     consumer,
     maxCount,
     maxIdleTimeMs,
@@ -50,6 +52,7 @@ export async function GET(
 async function readMessages(
   env: Env,
   logger: Logger,
+  channelId: string,
   consumer: string,
   maxCount: number,
   maxIdleTimeMs: number,
@@ -59,6 +62,7 @@ async function readMessages(
     env.redisHost,
     env.redisPort,
     env.redisStreamNameForLine,
+    channelId,
     env.redisGroupNameForLine
   );
   logger.debug("make redis client", {

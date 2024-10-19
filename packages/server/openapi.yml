@@ -100,13 +100,19 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/ErrorObject"
-  /api/line/webhook/messages/{messageId}:
+  /api/line/webhook/{channelId}/messages/{messageId}:
     delete:
       summary: Webhookメッセージを削除
       tags:
         - LINE Webhook
       description: Webhookメッセージを削除する。
       parameters:
+        - in: path
+          name: channelId
+          description: チャンネルID
+          required: true
+          schema:
+            type: string
         - in: path
           name: messageId
           description: メッセージID
@@ -133,7 +139,7 @@ paths:
               schema:
                 $ref: "#/components/schemas/ErrorObject"
 
-  /api/line/webhook/messages/new:
+  /api/line/webhook/{channelId}/messages/new:
     get:
       summary: 新たに処理すべきWebhookメッセージを取得
       tags:
@@ -152,6 +158,12 @@ paths:
         |済|他|最大超過|最大以下|◯|リトライするため取得する。配信数は+1。|
         |済|他|最大超過|最大超過|✕|リトライしても回復の見込みが無いためエラー扱い。|
       parameters:
+        - in: path
+          name: channelId
+          description: チャンネルID
+          required: true
+          schema:
+            type: string
         - in: query
           name: consumer
           description: コンシューマ名。
@@ -202,7 +214,7 @@ paths:
               schema:
                 $ref: "#/components/schemas/ErrorObject"
 
-  /api/line/webhook/events:
+  /api/line/webhook/{channelId}/events:
     post:
       summary: Webhookメッセージを追加（LINE Webhookの受け口）
       tags:
@@ -212,6 +224,12 @@ paths:
         POSTリクエストの仕様詳細はLINEのドキュメントを参照。
         - [Messaging API | Webhook](https://developers.line.biz/ja/reference/messaging-api/#webhooks)
       parameters:
+        - in: path
+          name: channelId
+          description: チャンネルID
+          required: true
+          schema:
+            type: string
         - in: header
           name: x-line-signature
           description: |
