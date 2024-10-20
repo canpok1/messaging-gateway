@@ -1,7 +1,7 @@
 import { Env } from "@/Env";
 import { v4 as uuidv4 } from "uuid";
 import { RequestDataParser } from "@/Request";
-import { RedisClient } from "@/Redis";
+import { CreateRedisClientByEnv, RedisClient } from "@/Redis";
 import { Request, Response } from "express";
 import { Logger } from "@/Logger";
 import { NotFoundError } from "@/Error";
@@ -36,13 +36,7 @@ async function deleteMessages(
   channelId: string,
   messageId: string
 ): Promise<void> {
-  const client = new RedisClient(
-    env.redisHost,
-    env.redisPort,
-    env.redisStreamPrefixForLine,
-    channelId,
-    env.redisGroupNameForLine
-  );
+  const client = CreateRedisClientByEnv(env, channelId);
   logger.debug("make redis client", {
     redisHost: env.redisHost,
     redisPort: env.redisPort,
@@ -51,9 +45,15 @@ async function deleteMessages(
     redisGroupName: env.redisGroupNameForLine,
   });
 
+  const ackedCount = await client.ackMessage(messageId);
+  if (ackedCount === 0) {
+    throw new NotFoundError("message not found when ack");
+  }
+  logger.debug("acked message", { messageId });
+
   const deletedCount = await client.deleteMessage(messageId);
   if (deletedCount === 0) {
-    throw new NotFoundError("message not found");
+    throw new NotFoundError("message not found when delete");
   }
   logger.debug("deleted message", { messageId });
 

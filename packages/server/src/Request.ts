@@ -7,10 +7,23 @@ export class RequestDataParser {
     this.req = req;
   }
 
+  getHeaderAsString(key: string): string {
+    const value = this.req.get(key);
+    if (!value) {
+      throw new RequestParamError(
+        `${key} is required header but was not found`
+      );
+    }
+
+    return value;
+  }
+
   getPathParamAsString(key: string): string {
     const value = this.req.params[key];
     if (!value) {
-      throw new RequestParamError(`${key} is required but was not found`);
+      throw new RequestParamError(
+        `${key} is required path param but was not found`
+      );
     }
 
     return value;
@@ -25,10 +38,16 @@ export class RequestDataParser {
     }
   }
 
+  getQueryParamAsStringWithDefault(key: string, def: string): string {
+    return this.getQueryParamAsStringOrUndefined(key) || def;
+  }
+
   getQueryParamAsString(key: string): string {
     const value = this.getQueryParamAsStringOrUndefined(key);
     if (!value) {
-      throw new RequestParamError(`${key} is required but was not found`);
+      throw new RequestParamError(
+        `${key} is required query param but was not found`
+      );
     }
 
     return value;
@@ -46,5 +65,9 @@ export class RequestDataParser {
     }
 
     return numberValue;
+  }
+
+  getQueryParamAsNumberWithDefault(key: string, def: number): number {
+    return this.getQueryParamAsNumberOrUndefined(key) || def;
   }
 }

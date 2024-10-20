@@ -1,7 +1,6 @@
 import { webhook } from "@line/bot-sdk";
 import { v4 as uuidv4 } from "uuid";
-import type { ErrorObject } from "@/types/api";
-import { RedisClient, WebhookStreamObject } from "@/Redis";
+import { CreateRedisClientByEnv, WebhookStreamObject } from "@/Redis";
 import express from "express";
 import { Env } from "@/Env";
 import { Logger } from "@/Logger";
@@ -21,29 +20,18 @@ export async function POST(
   const params = new RequestDataParser(req);
 
   const channelId = params.getPathParamAsString("channelId");
-  const signature: string = req.get(HEADER_SIGNATURE);
-  if (!signature) {
-    const errObj: ErrorObject = {
-      message: `not found required header[${HEADER_SIGNATURE}]`,
-    };
-    res.status(400).json(errObj);
-    return;
-  }
+  const signature = params.getHeaderAsString(HEADER_SIGNATURE);
 
   const body = req.body as webhook.CallbackRequest;
-  logger.info("received request", { signature, body });
+  logger.info("received request", { channelId, signature, body });
 
-  const client = new RedisClient(
-    env.redisHost,
-    env.redisPort,
-    env.redisStreamPrefixForLine,
-    channelId,
-    env.redisGroupNameForLine
-  );
+  const client = CreateRedisClientByEnv(env, channelId);
   logger.debug("make redis client", {
     redisHost: env.redisHost,
     redisPort: env.redisPort,
     redisStreamName: env.redisStreamPrefixForLine,
+    channelId,
+    redisGroupName: env.redisGroupNameForLine,
   });
 
   const streamObj: WebhookStreamObject = {

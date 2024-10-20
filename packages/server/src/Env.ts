@@ -7,10 +7,12 @@ export interface EnvParam {
   encryptionPassword: SecretString;
   redisHost: string;
   redisPort: number;
+  redisMaxRetriesPerRequest: number;
   redisStreamPrefixForLine: string;
   redisGroupNameForLine: string;
 }
 
+export type OptionalEnvParam = Partial<EnvParam>;
 export type Env = Readonly<EnvParam>;
 
 export function createEnvParamFromProcessEnv(env: NodeJS.ProcessEnv): EnvParam {
@@ -20,6 +22,10 @@ export function createEnvParamFromProcessEnv(env: NodeJS.ProcessEnv): EnvParam {
     encryptionPassword: getSecretStringValue(env, "ENCRYPTION_PASSWORD"),
     redisHost: getStringValue(env, "REDIS_HOST"),
     redisPort: getNumberValue(env, "REDIS_PORT"),
+    redisMaxRetriesPerRequest: getNumberValue(
+      env,
+      "REDIS_MAX_RETRIES_PER_REQUEST"
+    ),
     redisStreamPrefixForLine: getStringValue(
       env,
       "REDIS_STREAM_PREFIX_FOR_LINE"
