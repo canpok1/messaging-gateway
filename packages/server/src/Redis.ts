@@ -48,6 +48,9 @@ export class RedisClient {
       maxRetriesPerRequest,
     });
 
+    // エラー情報が標準出力されないようにする
+    this.client.on("error", (_err) => {});
+
     this.streamName = `${streamPrefix}:${channelId}`;
     this.groupName = groupName;
   }
