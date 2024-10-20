@@ -1,5 +1,5 @@
 import { WebhookMessageObject } from "@/types/api";
-import { Redis } from "ioredis";
+import { Redis, ReplyError } from "ioredis";
 import { webhook } from "@line/bot-sdk";
 import { Logger } from "winston";
 import { Env } from "@/Env";
@@ -15,7 +15,12 @@ export type WebhookStreamObject = {
   events: webhook.Event[];
 };
 
-export function CreateRedisClientByEnv(
+export type RedisRawMessage = {
+  messageId: string;
+  messageValue: string;
+};
+
+export function createRedisClientByEnv(
   env: Env,
   channelId: string
 ): RedisClient {
@@ -30,6 +35,7 @@ export function CreateRedisClientByEnv(
 }
 
 export class RedisClient {
+  private streamPrefix: string;
   private streamName: string;
   private groupName: string;
   private client: Redis;
@@ -51,6 +57,7 @@ export class RedisClient {
     // エラー情報が標準出力されないようにする
     this.client.on("error", (_err) => {});
 
+    this.streamPrefix = streamPrefix;
     this.streamName = `${streamPrefix}:${channelId}`;
     this.groupName = groupName;
   }
@@ -189,6 +196,82 @@ export class RedisClient {
 
   async ackMessage(messageId: string): Promise<number> {
     return await this.client.xack(this.streamName, this.groupName, messageId);
+  }
+
+  async eachStream(
+    callback: (streamName: string) => Promise<void>
+  ): Promise<void> {
+    let cursor = "0";
+
+    while (true) {
+      const [nextCursor, keys] = await this.client.scan(
+        cursor,
+        "MATCH",
+        `${this.streamPrefix}:*`,
+        "COUNT",
+        "100",
+        "TYPE",
+        "stream"
+      );
+      for (const key of keys) {
+        await callback(key);
+      }
+
+      if (nextCursor === "0") {
+        break;
+      }
+      cursor = nextCursor;
+    }
+  }
+
+  async autoClaim(
+    streamName: string,
+    consumer: string,
+    minIdleTime: number,
+    count: number
+  ): Promise<RedisRawMessage[]> {
+    try {
+      const result = await this.client.xautoclaim(
+        streamName,
+        this.groupName,
+        consumer,
+        minIdleTime,
+        "0-0",
+        "COUNT",
+        count
+      );
+      /*
+      取得結果は次の形式。２つ目の要素が再割り当てされたメッセージ。
+      1) "1728895288510-0"
+      2) 1) 1) "1728891713419-0"
+            2) 1) "message"
+               2) "value"
+         2) 1) "1728893217213-0"
+            2) 1) "message"
+               2) "value"
+         3) 1) "1728895085887-0"
+            2) 1) "message"
+               2) "value"
+      3) (empty array)
+      */
+      const claimedMessages = result[1] as unknown[];
+
+      const messages: RedisRawMessage[] = [];
+
+      for (const claimedMessage of claimedMessages) {
+        const messageId = claimedMessage[0] as string;
+        const fields = claimedMessage[1] as string[];
+        const value = this.findValue(fields, MESSAGE_KEY);
+        messages.push({ messageId, messageValue: value });
+      }
+
+      return messages;
+    } catch (err) {
+      if (err instanceof ReplyError && err.message.includes("NOGROUP")) {
+        return [];
+      }
+      throw err;
+    }
   }
 
   private async xpending(

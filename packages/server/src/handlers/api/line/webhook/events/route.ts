@@ -1,6 +1,6 @@
 import { webhook } from "@line/bot-sdk";
 import { v4 as uuidv4 } from "uuid";
-import { CreateRedisClientByEnv, WebhookStreamObject } from "@/Redis";
+import { createRedisClientByEnv, WebhookStreamObject } from "@/Redis";
 import express from "express";
 import { Env } from "@/Env";
 import { Logger } from "@/Logger";
@@ -25,7 +25,7 @@ export async function POST(
   const body = req.body as webhook.CallbackRequest;
   logger.info("received request", { channelId, signature, body });
 
-  const client = CreateRedisClientByEnv(env, channelId);
+  const client = createRedisClientByEnv(env, channelId);
   logger.debug("make redis client", {
     redisHost: env.redisHost,
     redisPort: env.redisPort,

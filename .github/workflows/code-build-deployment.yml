@@ -19,6 +19,10 @@ jobs:
       REDIS_MAX_RETRIES_PER_REQUEST: 1
       REDIS_STREAM_PREFIX_FOR_LINE: test-stream
       REDIS_GROUP_NAME_FOR_LINE: processor
+      CLEANER_CONSUMER_NAME: cleaner
+      CLEANER_MIN_IDLE_MS: 300000
+      CLEANER_BATCH_SIZE: 5
+      CLEANER_INTERVAL_MS: 300000
     services:
       redis:
         image: redis:7.4

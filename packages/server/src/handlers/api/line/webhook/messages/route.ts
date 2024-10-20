@@ -1,7 +1,7 @@
 import { Env } from "@/Env";
 import { v4 as uuidv4 } from "uuid";
 import { RequestDataParser } from "@/Request";
-import { CreateRedisClientByEnv, RedisClient } from "@/Redis";
+import { createRedisClientByEnv } from "@/Redis";
 import { Request, Response } from "express";
 import { Logger } from "@/Logger";
 import { NotFoundError } from "@/Error";
@@ -36,7 +36,7 @@ async function deleteMessages(
   channelId: string,
   messageId: string
 ): Promise<void> {
-  const client = CreateRedisClientByEnv(env, channelId);
+  const client = createRedisClientByEnv(env, channelId);
   logger.debug("make redis client", {
     redisHost: env.redisHost,
     redisPort: env.redisPort,
