@@ -1,12 +1,10 @@
 import { webhook } from "@line/bot-sdk";
 import { v4 as uuidv4 } from "uuid";
-import type { ErrorObject } from "@/types/api";
-import { RedisClient, WebhookStreamObject } from "@/Redis";
+import { CreateRedisClientByEnv, WebhookStreamObject } from "@/Redis";
 import express from "express";
 import { Env } from "@/Env";
 import { Logger } from "@/Logger";
 import { RequestDataParser } from "@/Request";
-import { RequestParamError } from "@/Error";
 
 const HEADER_SIGNATURE = "x-line-signature";
 
@@ -27,13 +25,7 @@ export async function POST(
   const body = req.body as webhook.CallbackRequest;
   logger.info("received request", { channelId, signature, body });
 
-  const client = new RedisClient(
-    env.redisHost,
-    env.redisPort,
-    env.redisStreamPrefixForLine,
-    channelId,
-    env.redisGroupNameForLine
-  );
+  const client = CreateRedisClientByEnv(env, channelId);
   logger.debug("make redis client", {
     redisHost: env.redisHost,
     redisPort: env.redisPort,

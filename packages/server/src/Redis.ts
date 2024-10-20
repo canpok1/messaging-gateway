@@ -2,6 +2,7 @@ import { WebhookMessageObject } from "@/types/api";
 import { Redis } from "ioredis";
 import { webhook } from "@line/bot-sdk";
 import { Logger } from "winston";
+import { Env } from "@/Env";
 
 export const MESSAGE_KEY = "message";
 
@@ -14,6 +15,20 @@ export type WebhookStreamObject = {
   events: webhook.Event[];
 };
 
+export function CreateRedisClientByEnv(
+  env: Env,
+  channelId: string
+): RedisClient {
+  return new RedisClient(
+    env.redisHost,
+    env.redisPort,
+    env.redisStreamPrefixForLine,
+    channelId,
+    env.redisGroupNameForLine,
+    env.redisMaxRetriesPerRequest
+  );
+}
+
 export class RedisClient {
   private streamName: string;
   private groupName: string;
@@ -24,12 +39,15 @@ export class RedisClient {
     port: number,
     streamPrefix: string,
     channelId: string,
-    groupName: string
+    groupName: string,
+    maxRetriesPerRequest: number
   ) {
     this.client = new Redis({
       host,
       port,
+      maxRetriesPerRequest,
     });
+
     this.streamName = `${streamPrefix}:${channelId}`;
     this.groupName = groupName;
   }
@@ -163,7 +181,11 @@ export class RedisClient {
   }
 
   async deleteMessage(messageId: string): Promise<number> {
-    return await this.xack(messageId);
+    return await this.client.del(this.streamName, messageId);
+  }
+
+  async ackMessage(messageId: string): Promise<number> {
+    return await this.client.xack(this.streamName, this.groupName, messageId);
   }
 
   private async xpending(
@@ -204,10 +226,6 @@ export class RedisClient {
     const fields = result[0][1] as string[];
     const value = this.findValue(fields, "message");
     return JSON.parse(value);
-  }
-
-  private async xack(messageId: string): Promise<number> {
-    return await this.client.xack(this.streamName, this.groupName, messageId);
   }
 
   private findValue(fields: string[], key: string): string {
