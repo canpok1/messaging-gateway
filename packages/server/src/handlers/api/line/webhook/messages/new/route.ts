@@ -2,7 +2,7 @@ import { Env } from "@/Env";
 import { v4 as uuidv4 } from "uuid";
 import type { WebhookMessageObject } from "@/types/api";
 import { RequestDataParser } from "@/Request";
-import { CreateRedisClientByEnv, RedisClient } from "@/Redis";
+import { createRedisClientByEnv } from "@/Redis";
 import { paths } from "@/types/api.gen";
 import { Request, Response } from "express";
 import { Logger } from "@/Logger";
@@ -63,7 +63,7 @@ async function readMessages(
   maxIdleTimeMs: number,
   maxDeliveryCount: number
 ): Promise<WebhookMessageObject[]> {
-  const client = CreateRedisClientByEnv(env, channelId);
+  const client = createRedisClientByEnv(env, channelId);
   logger.debug("make redis client", {
     redisHost: env.redisHost,
     redisPort: env.redisPort,

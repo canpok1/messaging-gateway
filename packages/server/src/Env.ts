@@ -10,6 +10,10 @@ export interface EnvParam {
   redisMaxRetriesPerRequest: number;
   redisStreamPrefixForLine: string;
   redisGroupNameForLine: string;
+  cleanerConsumerName: string;
+  cleanerMinIdleMs: number;
+  cleanerBatchSize: number;
+  cleanerIntervalMs: number;
 }
 
 export type OptionalEnvParam = Partial<EnvParam>;
@@ -31,6 +35,10 @@ export function createEnvParamFromProcessEnv(env: NodeJS.ProcessEnv): EnvParam {
       "REDIS_STREAM_PREFIX_FOR_LINE"
     ),
     redisGroupNameForLine: getStringValue(env, "REDIS_GROUP_NAME_FOR_LINE"),
+    cleanerConsumerName: getStringValue(env, "CLEANER_CONSUMER_NAME"),
+    cleanerMinIdleMs: getNumberValue(env, "CLEANER_MIN_IDLE_MS"),
+    cleanerBatchSize: getNumberValue(env, "CLEANER_BATCH_SIZE"),
+    cleanerIntervalMs: getNumberValue(env, "CLEANER_INTERVAL_MS"),
   };
 }
 
