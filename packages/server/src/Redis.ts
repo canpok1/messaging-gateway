@@ -191,7 +191,7 @@ export class RedisClient {
   }
 
   async deleteMessage(messageId: string): Promise<number> {
-    return await this.client.del(this.streamName, messageId);
+    return await this.client.xdel(this.streamName, messageId);
   }
 
   async ackMessage(messageId: string): Promise<number> {

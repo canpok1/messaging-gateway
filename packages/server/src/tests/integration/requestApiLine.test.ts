@@ -497,7 +497,6 @@ describe("GET /api/line/webhook/{channelId}/messages/new", () => {
 
 describe("DELETE /api/line/webhook/{channelId}/messages/{messageId}", () => {
   const channelId = "dummy-channel-id";
-  const existingMessageId = "1111-1";
   const streamName = `${streamPrefix}:${channelId}`;
 
   describe("正常系（200）", () => {
@@ -509,11 +508,20 @@ describe("DELETE /api/line/webhook/{channelId}/messages/{messageId}", () => {
       await cleanupRedisStream(env, channelId);
     });
 
-    describe("自身への配信済みメッセージあり", () => {
+    describe("自身への配信済みメッセージが複数あり", () => {
+      const messageIdToDelete = "1111-1";
+      const messageIdToKeep = "1111-2";
+
       beforeEach(async () => {
         await redis.xadd(
           streamName,
-          existingMessageId,
+          messageIdToDelete,
+          "message",
+          JSON.stringify({})
+        );
+        await redis.xadd(
+          streamName,
+          messageIdToKeep,
           "message",
           JSON.stringify({})
         );
@@ -528,8 +536,8 @@ describe("DELETE /api/line/webhook/{channelId}/messages/{messageId}", () => {
         );
       });
 
-      it("メッセージが削除される", async () => {
-        const url = `/api/line/webhook/${channelId}/messages/${existingMessageId}`;
+      it("指定したメッセージのみが削除される", async () => {
+        const url = `/api/line/webhook/${channelId}/messages/${messageIdToDelete}`;
         const app = createApp(env, logger);
 
         const response = await request(app).delete(url);
@@ -537,8 +545,20 @@ describe("DELETE /api/line/webhook/{channelId}/messages/{messageId}", () => {
         expect.soft(response.status).toBe(200);
         expect.soft(response.body).toEqual({});
 
-        const messageCount = await redis.xlen(streamName);
-        expect.soft(messageCount).toEqual(0);
+        const deletedMessage = await redis.xrange(
+          streamName,
+          messageIdToDelete,
+          messageIdToDelete
+        );
+        expect.soft(deletedMessage.length).toEqual(0);
+
+        const keptMessage = await redis.xrange(
+          streamName,
+          messageIdToKeep,
+          messageIdToKeep
+        );
+        expect(keptMessage.length).toEqual(1);
+        expect(keptMessage[0][0]).toEqual(messageIdToKeep);
       });
     });
   });
@@ -561,6 +581,8 @@ describe("DELETE /api/line/webhook/{channelId}/messages/{messageId}", () => {
     });
 
     describe("グループなし", () => {
+      const existingMessageId = "1111-1";
+
       beforeEach(async () => {
         await redis.xadd(
           streamName,
@@ -585,6 +607,8 @@ describe("DELETE /api/line/webhook/{channelId}/messages/{messageId}", () => {
     });
 
     describe("メッセージなし", () => {
+      const existingMessageId = "1111-1";
+
       beforeEach(async () => {
         await redis.xadd(
           streamName,
