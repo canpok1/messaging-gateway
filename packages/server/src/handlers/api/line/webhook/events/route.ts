@@ -33,17 +33,20 @@ export async function POST(
     channelId,
     redisGroupName: env.redisGroupNameForLine,
   });
+  try {
+    const streamObj: WebhookStreamObject = {
+      requestId,
+      signature,
+      destination: body.destination,
+      events: body.events,
+    };
+    logger.debug("make webhook stream object", { streamObj });
 
-  const streamObj: WebhookStreamObject = {
-    requestId,
-    signature,
-    destination: body.destination,
-    events: body.events,
-  };
-  logger.debug("make webhook stream object", { streamObj });
+    const id = await client.addWebhookStreamObject(streamObj);
+    logger.info("added webhookStreamObject", { id });
 
-  const id = await client.addWebhookStreamObject(streamObj);
-  logger.info("added webhookStreamObject", { id });
-
-  res.status(200).json({});
+    res.status(200).json({});
+  } finally {
+    await client.disconnect();
+  }
 }
