@@ -23,9 +23,9 @@
         <div class='clearfix'>
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">97.89% </span>
+                <span class="strong">97.91% </span>
                 <span class="quiet">Statements</span>
-                <span class='fraction'>93/95</span>
+                <span class='fraction'>94/96</span>
             </div>
         
             
@@ -44,9 +44,9 @@
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">97.89% </span>
+                <span class="strong">97.91% </span>
                 <span class="quiet">Lines</span>
-                <span class='fraction'>93/95</span>
+                <span class='fraction'>94/96</span>
             </div>
         
             
@@ -178,11 +178,15 @@
 <a name='L113'></a><a href='#L113'>113</a>
 <a name='L114'></a><a href='#L114'>114</a>
 <a name='L115'></a><a href='#L115'>115</a>
-<a name='L116'></a><a href='#L116'>116</a></td><td class="line-coverage quiet"><span class="cline-any cline-yes">1x</span>
-<span class="cline-any cline-yes">1x</span>
+<a name='L116'></a><a href='#L116'>116</a>
+<a name='L117'></a><a href='#L117'>117</a>
+<a name='L118'></a><a href='#L118'>118</a>
+<a name='L119'></a><a href='#L119'>119</a>
+<a name='L120'></a><a href='#L120'>120</a></td><td class="line-coverage quiet"><span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">1x</span>
-<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -252,6 +256,7 @@
 <span class="cline-any cline-yes">11x</span>
 <span class="cline-any cline-yes">11x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">11x</span>
 <span class="cline-any cline-yes">11x</span>
 <span class="cline-any cline-yes">11x</span>
 <span class="cline-any cline-yes">1x</span>
@@ -292,7 +297,10 @@
 <span class="cline-any cline-yes">9x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">9x</span>
-<span class="cline-any cline-yes">9x</span>
+<span class="cline-any cline-yes">11x</span>
+<span class="cline-any cline-yes">11x</span>
+<span class="cline-any cline-yes">11x</span>
+<span class="cline-any cline-yes">11x</span>
 <span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">import { Env } from "@/Env";
 import { v4 as uuidv4 } from "uuid";
 import type { WebhookMessageObject } from "@/types/api";
@@ -367,46 +375,50 @@ async function readMessages(
     redisGroupName: env.redisGroupNameForLine,
   });
 &nbsp;
-  const entriesCount = await client.countStreamEntries();
-  if (entriesCount === 0) {
-    return [];
-  }
+  try {
+    const entriesCount = await client.countStreamEntries();
+    if (entriesCount === 0) {
+      return [];
+    }
 &nbsp;
-  const created = await client.createConsumerGroupIfNotExists();
-  if (created) {
-    logger.debug(`created consumer group ${env.redisGroupNameForLine}`);
-  } else {
-    logger.debug(
-      `skiped created consumer group ${env.redisGroupNameForLine}, group is exists`
+    const created = await client.createConsumerGroupIfNotExists();
+    if (created) {
+      logger.debug(`created consumer group ${env.redisGroupNameForLine}`);
+    } else {
+      logger.debug(
+        `skiped created consumer group ${env.redisGroupNameForLine}, group is exists`
+      );
+    }
+&nbsp;
+    const longPendingMessages = await client.readLongPendingMessages(
+      logger,
+      consumer,
+      maxIdleTimeMs,
+      maxCount,
+      maxDeliveryCount
     );
+    logger.debug("read long pending messages", { longPendingMessages });
+&nbsp;
+    if (maxCount &amp;&amp; longPendingMessages.length &gt;= maxCount) <span class="branch-0 cbranch-no" title="branch not covered" >{</span>
+<span class="cstat-no" title="statement not covered" >      return longPendingMessages;</span>
+<span class="cstat-no" title="statement not covered" >    }</span>
+&nbsp;
+    const readNewMessagesMaxCount = Math.max(
+      maxCount - longPendingMessages.length,
+      0
+    );
+&nbsp;
+    const newMessages = await client.readNewMessages(
+      logger,
+      consumer,
+      readNewMessagesMaxCount
+    );
+    logger.debug("read new messages", { newMessages });
+&nbsp;
+    return longPendingMessages.concat(newMessages);
+  } finally {
+    await client.disconnect();
   }
-&nbsp;
-  const longPendingMessages = await client.readLongPendingMessages(
-    logger,
-    consumer,
-    maxIdleTimeMs,
-    maxCount,
-    maxDeliveryCount
-  );
-  logger.debug("read long pending messages", { longPendingMessages });
-&nbsp;
-  if (maxCount &amp;&amp; longPendingMessages.length &gt;= maxCount) <span class="branch-0 cbranch-no" title="branch not covered" >{</span>
-<span class="cstat-no" title="statement not covered" >    return longPendingMessages;</span>
-<span class="cstat-no" title="statement not covered" >  }</span>
-&nbsp;
-  const readNewMessagesMaxCount = Math.max(
-    maxCount - longPendingMessages.length,
-    0
-  );
-&nbsp;
-  const newMessages = await client.readNewMessages(
-    logger,
-    consumer,
-    readNewMessagesMaxCount
-  );
-  logger.debug("read new messages", { newMessages });
-&nbsp;
-  return longPendingMessages.concat(newMessages);
 }
 &nbsp;</pre></td></tr></table></pre>
 
@@ -415,7 +427,7 @@ async function readMessages(
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2024-10-27T09:38:38.779Z
+                at 2024-11-24T12:06:07.311Z
             </div>
         <script src="../../../../../../../prettify.js"></script>
         <script>

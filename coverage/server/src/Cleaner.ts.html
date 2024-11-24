@@ -25,7 +25,7 @@
             <div class='fl pad1y space-right2'>
                 <span class="strong">0% </span>
                 <span class="quiet">Statements</span>
-                <span class='fraction'>0/38</span>
+                <span class='fraction'>0/44</span>
             </div>
         
             
@@ -46,7 +46,7 @@
             <div class='fl pad1y space-right2'>
                 <span class="strong">0% </span>
                 <span class="quiet">Lines</span>
-                <span class='fraction'>0/38</span>
+                <span class='fraction'>0/44</span>
             </div>
         
             
@@ -110,25 +110,18 @@
 <a name='L45'></a><a href='#L45'>45</a>
 <a name='L46'></a><a href='#L46'>46</a>
 <a name='L47'></a><a href='#L47'>47</a>
-<a name='L48'></a><a href='#L48'>48</a></td><td class="line-coverage quiet"><span class="cline-any cline-no">&nbsp;</span>
+<a name='L48'></a><a href='#L48'>48</a>
+<a name='L49'></a><a href='#L49'>49</a>
+<a name='L50'></a><a href='#L50'>50</a>
+<a name='L51'></a><a href='#L51'>51</a>
+<a name='L52'></a><a href='#L52'>52</a>
+<a name='L53'></a><a href='#L53'>53</a></td><td class="line-coverage quiet"><span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
@@ -143,6 +136,19 @@
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
@@ -151,6 +157,10 @@
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
@@ -159,34 +169,35 @@
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js"><span class="cstat-no" title="statement not covered" >import { Env } from "@/Env";<span class="fstat-no" title="function not covered" ><span class="branch-0 cbranch-no" title="branch not covered" ></span></span></span>
 import { Logger } from "@/Logger";
-<span class="cstat-no" title="statement not covered" >import { createRedisClientByEnv, RedisClient, RedisRawMessage } from "@/Redis";</span>
+import { createRedisClientByEnv, RedisClient, RedisRawMessage } from "@/Redis";
 &nbsp;
 <span class="cstat-no" title="statement not covered" >export class MessageCleaner {</span>
-  private redis: RedisClient;
-&nbsp;
 <span class="cstat-no" title="statement not covered" >  constructor(</span>
 <span class="cstat-no" title="statement not covered" >    private env: Env,</span>
 <span class="cstat-no" title="statement not covered" >    private consumer: string,</span>
 <span class="cstat-no" title="statement not covered" >    private minIdleTime: number,</span>
 <span class="cstat-no" title="statement not covered" >    private batchSize: number</span>
-<span class="cstat-no" title="statement not covered" >  ) {</span>
-<span class="cstat-no" title="statement not covered" >    this.redis = createRedisClientByEnv(env, "dummy-channel-id");</span>
-<span class="cstat-no" title="statement not covered" >  }</span>
+<span class="cstat-no" title="statement not covered" >  ) {}</span>
 &nbsp;
 <span class="cstat-no" title="statement not covered" >  async clean(logger: Logger) {</span>
 <span class="cstat-no" title="statement not covered" >    logger.info("start clean all stream");</span>
 &nbsp;
-<span class="cstat-no" title="statement not covered" >    await this.redis.eachStream(async (streamName: string) =&gt; {</span>
-<span class="cstat-no" title="statement not covered" >      const childLogger = logger.child({ streamName });</span>
-<span class="cstat-no" title="statement not covered" >      await this.cleanByStream(childLogger, streamName);</span>
-<span class="cstat-no" title="statement not covered" >    });</span>
+<span class="cstat-no" title="statement not covered" >    const redis = createRedisClientByEnv(this.env, "dummy-channel-id");</span>
+<span class="cstat-no" title="statement not covered" >    try {</span>
+<span class="cstat-no" title="statement not covered" >      await redis.eachStream(async (streamName: string) =&gt; {</span>
+<span class="cstat-no" title="statement not covered" >        const childLogger = logger.child({ streamName });</span>
+<span class="cstat-no" title="statement not covered" >        await this.cleanByStream(childLogger, redis, streamName);</span>
+<span class="cstat-no" title="statement not covered" >      });</span>
 &nbsp;
-<span class="cstat-no" title="statement not covered" >    logger.info("end clean all stream");</span>
+<span class="cstat-no" title="statement not covered" >      logger.info("end clean all stream");</span>
+<span class="cstat-no" title="statement not covered" >    } finally {</span>
+<span class="cstat-no" title="statement not covered" >      await redis.disconnect();</span>
+<span class="cstat-no" title="statement not covered" >    }</span>
 <span class="cstat-no" title="statement not covered" >  }</span>
 &nbsp;
-<span class="cstat-no" title="statement not covered" >  async cleanByStream(logger: Logger, streamName: string) {</span>
+<span class="cstat-no" title="statement not covered" >  async cleanByStream(logger: Logger, redis: RedisClient, streamName: string) {</span>
 <span class="cstat-no" title="statement not covered" >    logger.info(`check stream [${streamName}]`);</span>
-<span class="cstat-no" title="statement not covered" >    const rawMessages = await this.redis.autoClaim(</span>
+<span class="cstat-no" title="statement not covered" >    const rawMessages = await redis.autoClaim(</span>
 <span class="cstat-no" title="statement not covered" >      streamName,</span>
 <span class="cstat-no" title="statement not covered" >      this.consumer,</span>
 <span class="cstat-no" title="statement not covered" >      this.minIdleTime,</span>
@@ -194,13 +205,17 @@ import { Logger } from "@/Logger";
 <span class="cstat-no" title="statement not covered" >    );</span>
 <span class="cstat-no" title="statement not covered" >    for (const rawMessage of rawMessages) {</span>
 <span class="cstat-no" title="statement not covered" >      const childLogger = logger.child({ ...rawMessage });</span>
-<span class="cstat-no" title="statement not covered" >      await this.cleanByMessage(childLogger, rawMessage);</span>
+<span class="cstat-no" title="statement not covered" >      await this.cleanByMessage(childLogger, redis, rawMessage);</span>
 <span class="cstat-no" title="statement not covered" >    }</span>
 <span class="cstat-no" title="statement not covered" >  }</span>
 &nbsp;
-<span class="cstat-no" title="statement not covered" >  async cleanByMessage(logger: Logger, rawMessage: RedisRawMessage) {</span>
-<span class="cstat-no" title="statement not covered" >    await this.redis.ackMessage(rawMessage.messageId);</span>
-<span class="cstat-no" title="statement not covered" >    await this.redis.deleteMessage(rawMessage.messageId);</span>
+<span class="cstat-no" title="statement not covered" >  async cleanByMessage(</span>
+<span class="cstat-no" title="statement not covered" >    logger: Logger,</span>
+<span class="cstat-no" title="statement not covered" >    redis: RedisClient,</span>
+<span class="cstat-no" title="statement not covered" >    rawMessage: RedisRawMessage</span>
+<span class="cstat-no" title="statement not covered" >  ) {</span>
+<span class="cstat-no" title="statement not covered" >    await redis.ackMessage(rawMessage.messageId);</span>
+<span class="cstat-no" title="statement not covered" >    await redis.deleteMessage(rawMessage.messageId);</span>
 <span class="cstat-no" title="statement not covered" >    logger.error(`deleted unhandled message [${rawMessage.messageId}]`);</span>
 <span class="cstat-no" title="statement not covered" >  }</span>
 <span class="cstat-no" title="statement not covered" >}</span>
@@ -211,7 +226,7 @@ import { Logger } from "@/Logger";
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2024-10-27T09:38:38.779Z
+                at 2024-11-24T12:06:07.311Z
             </div>
         <script src="../prettify.js"></script>
         <script>
