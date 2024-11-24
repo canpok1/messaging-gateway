@@ -71,6 +71,10 @@ export class RedisClient {
     );
   }
 
+  async disconnect(): Promise<void> {
+    await this.client.quit();
+  }
+
   async createConsumerGroupIfNotExists(): Promise<boolean> {
     try {
       await this.client.xgroup("CREATE", this.streamName, this.groupName, 0);

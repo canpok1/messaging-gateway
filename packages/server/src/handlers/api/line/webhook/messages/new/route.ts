@@ -72,44 +72,48 @@ async function readMessages(
     redisGroupName: env.redisGroupNameForLine,
   });
 
-  const entriesCount = await client.countStreamEntries();
-  if (entriesCount === 0) {
-    return [];
-  }
+  try {
+    const entriesCount = await client.countStreamEntries();
+    if (entriesCount === 0) {
+      return [];
+    }
 
-  const created = await client.createConsumerGroupIfNotExists();
-  if (created) {
-    logger.debug(`created consumer group ${env.redisGroupNameForLine}`);
-  } else {
-    logger.debug(
-      `skiped created consumer group ${env.redisGroupNameForLine}, group is exists`
+    const created = await client.createConsumerGroupIfNotExists();
+    if (created) {
+      logger.debug(`created consumer group ${env.redisGroupNameForLine}`);
+    } else {
+      logger.debug(
+        `skiped created consumer group ${env.redisGroupNameForLine}, group is exists`
+      );
+    }
+
+    const longPendingMessages = await client.readLongPendingMessages(
+      logger,
+      consumer,
+      maxIdleTimeMs,
+      maxCount,
+      maxDeliveryCount
     );
+    logger.debug("read long pending messages", { longPendingMessages });
+
+    if (maxCount && longPendingMessages.length >= maxCount) {
+      return longPendingMessages;
+    }
+
+    const readNewMessagesMaxCount = Math.max(
+      maxCount - longPendingMessages.length,
+      0
+    );
+
+    const newMessages = await client.readNewMessages(
+      logger,
+      consumer,
+      readNewMessagesMaxCount
+    );
+    logger.debug("read new messages", { newMessages });
+
+    return longPendingMessages.concat(newMessages);
+  } finally {
+    await client.disconnect();
   }
-
-  const longPendingMessages = await client.readLongPendingMessages(
-    logger,
-    consumer,
-    maxIdleTimeMs,
-    maxCount,
-    maxDeliveryCount
-  );
-  logger.debug("read long pending messages", { longPendingMessages });
-
-  if (maxCount && longPendingMessages.length >= maxCount) {
-    return longPendingMessages;
-  }
-
-  const readNewMessagesMaxCount = Math.max(
-    maxCount - longPendingMessages.length,
-    0
-  );
-
-  const newMessages = await client.readNewMessages(
-    logger,
-    consumer,
-    readNewMessagesMaxCount
-  );
-  logger.debug("read new messages", { newMessages });
-
-  return longPendingMessages.concat(newMessages);
 }
