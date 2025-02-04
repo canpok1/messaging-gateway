@@ -29,7 +29,7 @@
     "packages/tools"
   ],
   "devDependencies": {
-    "@types/node": "^22.13.0",
+    "@types/node": "^22.13.1",
     "@vitest/coverage-v8": "^2.1.8",
     "dotenv-cli": "^7.4.4",
     "openapi-typescript": "^7.6.1",
