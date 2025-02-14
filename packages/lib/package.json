@@ -15,7 +15,7 @@
   "license": "ISC",
   "description": "",
   "dependencies": {
-    "@line/bot-sdk": "^9.6.0",
+    "@line/bot-sdk": "^9.7.1",
     "node-jose": "^2.2.0"
   },
   "devDependencies": {
