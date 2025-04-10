@@ -21,7 +21,7 @@
     "@types/express": "^4.17.21",
     "@types/uuid": "^10.0.0",
     "supertest": "^7.1.0",
-    "typescript": "5.8.2",
+    "typescript": "5.8.3",
     "vite": "^4.5.13",
     "vite-plugin-node": "^3.1.0"
   }
