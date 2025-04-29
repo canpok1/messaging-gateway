@@ -4,7 +4,7 @@
   "type": "module",
   "devDependencies": {
     "@messaging-gateway/lib": "file:../lib",
-    "tsx": "^4.19.3"
+    "tsx": "^4.19.4"
   },
   "scripts": {
     "generate-jwt": "dotenv -e .env tsx src/JwtGenerator.ts",
