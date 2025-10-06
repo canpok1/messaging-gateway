@@ -14,7 +14,7 @@
   "dependencies": {
     "@messaging-gateway/lib": "file:../lib",
     "express": "^4.21.2",
-    "ioredis": "^5.8.0",
+    "ioredis": "^5.8.1",
     "uuid": "^10.0.0"
   },
   "devDependencies": {
