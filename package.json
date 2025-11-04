@@ -29,15 +29,15 @@
     "packages/tools"
   ],
   "devDependencies": {
-    "@types/node": "^22.13.1",
-    "@vitest/coverage-v8": "^2.1.8",
+    "@types/node": "^22.19.0",
+    "@vitest/coverage-v8": "^2.1.9",
     "dotenv-cli": "^7.4.4",
-    "openapi-typescript": "^7.6.1",
+    "openapi-typescript": "^7.10.0",
     "prisma": "^5.22.0",
     "vitest": "^2.1.9"
   },
   "dependencies": {
     "@prisma/client": "^5.22.0",
-    "winston": "^3.17.0"
+    "winston": "^3.18.3"
   }
 }

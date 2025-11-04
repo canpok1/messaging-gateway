@@ -14,15 +14,15 @@
   "dependencies": {
     "@messaging-gateway/lib": "file:../lib",
     "express": "^4.21.2",
-    "ioredis": "^5.4.2",
+    "ioredis": "^5.8.2",
     "uuid": "^10.0.0"
   },
   "devDependencies": {
     "@types/express": "^4.17.21",
     "@types/uuid": "^10.0.0",
-    "supertest": "^7.0.0",
-    "typescript": "5.7.3",
-    "vite": "^4.5.9",
+    "supertest": "^7.1.4",
+    "typescript": "5.9.3",
+    "vite": "^4.5.14",
     "vite-plugin-node": "^3.1.0"
   }
 }
