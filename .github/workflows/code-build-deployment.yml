@@ -66,7 +66,7 @@ jobs:
       - run: npm run lint
 
       - name: archive coverage reports
-        uses: actions/upload-artifact@v5
+        uses: actions/upload-artifact@v6
         with:
           name: coverage-reports
           path: public/coverage
@@ -137,7 +137,7 @@ jobs:
         run: make migrate options="down -all"
 
       - name: archive db docs
-        uses: actions/upload-artifact@v5
+        uses: actions/upload-artifact@v6
         with:
           name: db-docs
           path: public/database
