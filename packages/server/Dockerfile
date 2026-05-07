@@ -1,4 +1,4 @@
-FROM node:25 AS builder
+FROM node:26 AS builder
 WORKDIR /src
 
 COPY ./package*.json ./
@@ -14,7 +14,7 @@ RUN npm run -w packages/lib build
 RUN npm run -w packages/server build
 
 
-FROM node:25-slim
+FROM node:26-slim
 WORKDIR /src
 
 RUN apt-get update && apt-get install -y \
