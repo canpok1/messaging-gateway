@@ -13,7 +13,7 @@
   },
   "dependencies": {
     "@messaging-gateway/lib": "file:../lib",
-    "express": "^4.22.1",
+    "express": "^4.22.2",
     "ioredis": "^5.10.1",
     "uuid": "^10.0.0"
   },
